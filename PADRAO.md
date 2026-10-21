@@ -42,34 +42,19 @@ Regras:
 - Mantém intervalo de ~0,22 s (+6,5 m entre eixos) do carro da frente na mesma faixa; ultrapassa pelo lado livre; lado a lado nunca fecha (2,9 m de separação).
 - Largada: cada carro fica na sua fila do grid por ~7 s; desvia de carro muito mais lento mesmo nesse período.
 
-### Comissários (FIA)
-- Toque com impacto > 2,2 m/s abre investigação. Culpado: quem estava atrás (batida traseira) ou quem se moveu lateralmente pra cima do outro.
-- Pena só se a vítima foi prejudicada (rodou, saiu da pista, teve dano) ou impacto > 7 m/s: +5 s, ou +10 s acima de 8 m/s. Vale para jogador e IA.
-- Limites de pista (jogador): 4 rodas além da linha branca anula a volta; 3º aviso = bandeira preta e branca; a partir do 4º, +5 s cada.
+### Comissários (FIA) — base: diretrizes de penalidades F1 2025 (FIA, 14/05/2025)
+- Só pune quem for **total ou predominantemente culpado**; responsabilidade dividida = incidente de corrida, sem ação.
+- Investigação quando o toque passa de 2,2 m/s. Culpado: quem estava atrás numa batida traseira, ou quem se moveu lateralmente para cima do outro.
+- **Causar colisão:** 10 s (base); 5 s com atenuante (1ª volta nos primeiros 25 s, ou impacto < 5 m/s). **Sem consequência esportiva** (vítima não rodou, não saiu, sem dano, impacto ≤ 8 m/s): advertência.
+- **Empurrar para fora sem toque:** vítima sai da pista com o rival colado vindo na direção dela = 10 s / 5 s. A vítima não toma limite de pista.
+- **Sair da pista e ganhar posição (jogador):** 10 s para devolver; senão +10 s.
+- **Limites de pista:** volta anulada; 3ª = bandeira preta e branca; 4ª em diante = +5 s cada. Não conta se foi empurrado/batido para fora (espera 0,6 s).
+- IA defende com **um** movimento só (mais de um = 5 s na regra real).
 
-### Assistências (padrão ligadas; o teclado é tudo ou nada)
-- **Direção:** A/D pedem uma curvatura, limitada a 92% do que o pneu aguenta naquela velocidade. Volante todo nunca vira subesterço.
-- **Frenagem:** se a velocidade passa da que permite fazer o trecho à frente (perfil de velocidade × 0,95), freia sozinho e corta o acelerador.
-- ABS, controle de tração, câmbio automático e linha de corrida também vêm ligados.
-
-### Celular
-- `<meta name="viewport" content="width=device-width,...">` obrigatório (sem ele o celular desenha em 980 px e encolhe tudo).
-- Direção por arraste na metade esquerda (analógica, 70 px = volante todo), freio/gás/DRS à direita. Acelerador automático ligado por padrão no toque.
-- Controles de toque só aparecem durante a corrida; em pé mostra "gire o celular".
-- Telas baixas (≤ 520 px de altura): classificação só com top 3 e vizinhos, minimapa 96 px, sem painel de pneus.
-- Celular: resolução ×1,5, sombra 2048, sem pós-processamento, só modelos de baixo detalhe.
-- **Proporção da câmera vem do canvas na tela (`clientWidth/clientHeight`) e é conferida todo quadro.** Nunca só no evento `resize`: no celular ele chega antes do tamanho final ao girar e a imagem fica esticada.
-- Menu no celular: compacto, sem textos longos, botão Largar fixo no rodapé.
-- Teste obrigatório: abrir em pé, girar para deitado, conferir `camera.aspect == canvas.clientWidth/clientHeight`.
-
-### Som do motor (V6 1.6 turbo)
-- Onda periódica de um ciclo (720°, 6 explosões, bancos com leve assimetria); fundamental = rpm/120, pico = explosão rpm/20.
-- Aceite (medido com analisador): pico dominante em rpm/20 ± 2 Hz em 6.000, 10.000 e 11.800 rpm; componente 1,5× presente.
-- Camadas: escapamento com formantes fixos (420/1250/2900 Hz), ruído de combustão modulado na explosão, turbo com atraso, MGU-K, limitador, corte de 35 ms na troca, estalos ao tirar o pé, zebra, vento, pneu.
-- 3 carros mais próximos da câmera com voz própria, Doppler e pan.
-
-### Rodas em velocidade
-- Giro visual limitado a 0,45 rad/quadro; acima de ~45 km/h um disco de borrão (simétrico, com a faixa do composto) aparece na face externa do pneu, opaco a partir de ~120 km/h. Evita o efeito estroboscópico (roda parada ou girando ao contrário).
+### Disputa
+- Vácuo: até −30% de arrasto colado atrás na mesma linha (8–40 m). Ar sujo: até −25% de downforce colado em curva (6–28 m).
+- IA colada atrás freia mais cedo (0,68 em vez de 0,8 do limite) e abre distância quando o da frente freia.
+- HUD mostra o intervalo para o carro da frente e de trás e "VÁCUO".
 
 ## 3. Modelos de carro
 

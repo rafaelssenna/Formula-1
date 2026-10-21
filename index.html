@@ -55,6 +55,9 @@ h1 span{color:var(--red)}
 .tower .p{font-family:var(--display);font-weight:700;font-size:14px;text-align:center}
 .tower .c{height:14px;border-radius:1px}
 .tower .g{text-align:right;color:var(--mut);font-size:11px}
+.gaps{position:absolute;top:calc(max(10px,env(safe-area-inset-top,0px)) + 62px);left:50%;transform:translateX(-50%);display:flex;gap:6px;font-family:var(--display);font-weight:700;font-size:14px}
+.gaps span{background:var(--panel);border-radius:4px;padding:3px 9px}.gaps .up{color:#ff6b6b}.gaps .dn{color:#3ddc84}.gaps .tow{color:#47c7fc}
+@media (max-height:520px){.gaps{top:calc(max(6px,env(safe-area-inset-top,0px)) + 40px);font-size:12px}}
 .tower .pen{color:var(--yellow);font-style:normal;font-size:10px;margin-left:3px}
 .tower .g.drs{color:var(--green)}
 .timing{position:absolute;top:max(10px,env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);background:var(--panel);border-radius:4px;padding:6px 14px;display:flex;gap:18px;align-items:center;font-size:13px}
@@ -177,6 +180,7 @@ tr.me td{background:rgba(255,255,255,.08)}
     <div><small>Melhor</small><div class="d" id="best">--</div></div>
     <div><small>Delta</small><div class="d" id="delta">--</div></div>
   </div>
+  <div class="gaps" id="gaps"></div>
   <canvas id="map" width="340" height="340"></canvas>
   <div class="flag hidden" id="flag"></div>
   <div class="tyres" id="tyres"></div>
@@ -336,6 +340,10 @@ const TEXT_CACHE={};const textTex=(txt,bg,fg,w,h,font)=>TEXT_CACHE[[txt,bg,fg,w,
 /* faixas ao longo da pista */
 /* distância de (x,z) ao traçado inteiro: grade espacial de 40 m sobre todos os pontos da pista */
 const TGRID=(()=>{const g=new Map(),C=40;for(let i=0;i<N;i++){const p=T.p[i];const k=Math.floor(p.x/C)+','+Math.floor(p.z/C);(g.get(k)||g.set(k,[]).get(k)).push(i)}return{g,C}})();
+function tvSpots(){const out=[];for(const [cs] of CORNERS){const bi=idxAt(cs);const i=((bi-Math.round(60/T.ds))%N+N)%N;const p=T.p[i],n=T.n[i];const off=outsideOf(bi)*(HW+11);out.push({s:i*T.ds,x:p.x+n.x*off,y:p.y,z:p.z+n.z*off})}return out}
+/* campo de visão das câmeras de TV livre: nada de árvore a menos de 70 m da câmera nem perto da linha câmera->trecho filmado */
+function blocksTV(x,z){if(!blocksTV.sp)blocksTV.sp=tvSpots();for(const c of blocksTV.sp){const d=Math.hypot(x-c.x,z-c.z);if(d<70)return true;
+  for(const ds of[0,30,60,90,120]){const i=idxAt(c.s+ds);const p=T.p[i];const vx=p.x-c.x,vz=p.z-c.z,L=Math.hypot(vx,vz)||1;const t=((x-c.x)*vx+(z-c.z)*vz)/L;if(t>0&&t<L&&Math.abs((x-c.x)*vz-(z-c.z)*vx)/L<14)return true}}return false}
 function nearPits(x,z){for(let s=T.L-480;s<=T.L+60;s+=25){const f=frameAt(((s%T.L)+T.L)%T.L,-(HW+30));if(Math.hypot(f.x-x,f.z-z)<48)return true}return false}
 function trackDist(x,z,maxR){const C=TGRID.C,R=Math.ceil((maxR||200)/C);const cx=Math.floor(x/C),cz=Math.floor(z/C);let best=1e9;
   for(let a=-R;a<=R;a++)for(let b=-R;b<=R;b++){const l=TGRID.g.get((cx+a)+','+(cz+b));if(!l)continue;for(const i of l){const p=T.p[i];const d=(p.x-x)*(p.x-x)+(p.z-z)*(p.z-z);if(d<best)best=d}}return Math.sqrt(best)}
@@ -490,7 +498,7 @@ grandstand(0.80*T.L,220,HW+24,4,true);              // Junção / Subida dos Box
   const leafTex=canvasTex(256,256,(x,w,h)=>{x.fillStyle='#4a7a35';x.fillRect(0,0,w,h);for(let k=0;k<2600;k++){const l=40+Math.random()*60;x.fillStyle=`hsl(${95+Math.random()*25},${35+Math.random()*25}%,${l*0.45}%)`;x.beginPath();x.arc(Math.random()*w,Math.random()*h,1.5+Math.random()*3.5,0,7);x.fill()}});leafTex.encoding=THREE.sRGBEncoding;
   const crownM=new THREE.MeshStandardMaterial({map:leafTex,roughness:.95});const trunkM=mat(0x4a3524,1);const trunkG=new THREE.CylinderGeometry(.3,.5,5,6);trunkG.translate(0,2.5,0);
   const trees=[];let tries=0;while(trees.length<(MOBILE?420:900)&&tries<12000){tries++;const i=(Math.random()*N)|0;const side=Math.random()<.5?-1:1;const off=side*(HW+28+Math.random()*150);const p=T.p[i],n=T.n[i];
-    const x=p.x+n.x*off,z=p.z+n.z*off;const j=nearest(new THREE.Vector3(x,0,z),i);const d=trackDist(x,z,80);if(d<HW+26)continue;   /* checa a pista toda: trechos vizinhos de Interlagos */if(nearPits(x,z))continue;if((window.__lakes||[]).some(l=>Math.hypot(x-l.x,z-l.z)<l.R*1.35+8))continue;   /* nada de árvore dentro dos lagos */trees.push([x,T.y[j]-0.8,z,0.8+Math.random()*1.1,Math.random()])}
+    const x=p.x+n.x*off,z=p.z+n.z*off;const j=nearest(new THREE.Vector3(x,0,z),i);const d=trackDist(x,z,80);if(d<HW+26)continue;   /* checa a pista toda: trechos vizinhos de Interlagos */if(nearPits(x,z)||blocksTV(x,z))continue;if((window.__lakes||[]).some(l=>Math.hypot(x-l.x,z-l.z)<l.R*1.35+8))continue;   /* nada de árvore dentro dos lagos */trees.push([x,T.y[j]-0.8,z,0.8+Math.random()*1.1,Math.random()])}
   const cIM=new THREE.InstancedMesh(crownGeo,crownM,trees.length*3),tIM=new THREE.InstancedMesh(trunkG,trunkM,trees.length);const o=new THREE.Object3D();const col=new THREE.Color();
   trees.forEach((t,k)=>{const [x,y,z,s,r]=t;o.position.set(x,y,z);o.rotation.set(0,r*6.28,0);o.scale.setScalar(s);o.updateMatrix();tIM.setMatrixAt(k,o.matrix);
     [[0,7,0,4.4],[2.2,6,1.3,3.3],[-2,6.4,-1.4,3.5]].forEach(([ox,oy,oz,rr],q)=>{o.position.set(x+ox*s,y+oy*s,z+oz*s);o.rotation.set(r*3,r*6.28+q,0);o.scale.set(rr*s,rr*s*(0.9+r*0.2),rr*s);o.updateMatrix();cIM.setMatrixAt(k*3+q,o.matrix);col.setHSL(0.22+r*0.08,0.20+r*0.14,0.36+((k*7+q)%5)*0.035);   /* verde-oliva escuro de mata, sem cara de desenho */cIM.setColorAt(k*3+q,col)})});
@@ -699,7 +707,7 @@ function collideCars(A,B){const dx0=B.pos.x-A.pos.x,dz0=B.pos.z-A.pos.z;if(dx0*d
   apply(A,rA,-1,mA);apply(B,rB,1,mB);
   /* dano: asa dianteira se o contato foi na frente (> 1,9 m do centro), lateral/traseira leve */
   const dv=Math.abs(vn);for(const[C,bx,p]of[[A,a,rA],[B,b,rB]]){const lon=p.x*bx.f.x+p.z*bx.f.z;const w=lon>1.9?0.07:0.025;if(dv>2.5)C.dmg=Math.min(0.5,C.dmg+dv*w*0.2);if(dv>4&&lon>1.9)C.wing=Math.min(1,(C.wing||0)+(dv-4)*0.06);   /* asa quebra acima de ~14 km/h de impacto frontal */
-    if(C.isPlayer&&dv>2&&navigator.vibrate)try{navigator.vibrate(Math.min(250,30+dv*15))}catch(e){}}
+    if(dv>3)C.forcedUntil=race.time+2;if(C.isPlayer&&dv>2&&navigator.vibrate)try{navigator.vibrate(Math.min(250,30+dv*15))}catch(e){}}
   return{n,vn:dv,px,pz,j}}
 /* comissários: quem causou o toque? quem bateu por trás, ou quem se moveu lateralmente pra cima do outro. Pena só se o outro foi prejudicado. */
 const INQ=[];
@@ -712,14 +720,28 @@ function judgeContact(A,B,h){if(window.__dbg&&window.__dbg.onContact)window.__db
   if(!culprit)return;const victim=culprit===A?B:A;A.lastInq=B.lastInq=race.time;
   INQ.push({culprit,victim,t:race.time,sev:h.vn,off0:victim.offTrack,dmg0:victim.dmg});
   if(culprit.isPlayer||victim.isPlayer)race.toast('INVESTIGAÇÃO',`Toque entre ${culprit.d.c} e ${victim.d.c}`)}
-function checkInvestigations(){for(let k=INQ.length-1;k>=0;k--){const q=INQ[k];const v=q.victim;if(Math.abs(v.yawRate||0)>1.6)q.spun=true;if(race.time-q.t<2.5)continue;INQ.splice(k,1);
-  const harmed=q.spun||v.offTrack>q.off0+0.4||v.dmg>q.dmg0+0.03||q.sev>7;const pen=q.sev>8?10:5;
-  if(harmed){q.culprit.penalty+=pen;if(q.culprit.isPlayer)race.toast('PENALIDADE +'+pen+' s','Causou colisão com '+v.d.c);else if(v.isPlayer)race.toast(q.culprit.d.c+' PUNIDO','+'+pen+' s por causar colisão')}
-  else if(q.culprit.isPlayer||v.isPlayer)race.toast('SEM AÇÃO','Toque de corrida')}}
+/* decisão (diretrizes FIA 2025): causar colisão = 10 s (base); 5 s com atenuante (1ª volta ou impacto baixo);
+   sem consequência esportiva = advertência. Responsabilidade dividida = incidente de corrida (sem ação). */
+function checkInvestigations(){for(let k=INQ.length-1;k>=0;k--){const q=INQ[k];const v=q.victim;if(Math.abs(v.yawRate||0)>1.6||Math.abs(wrapA(v.hd-v.va))>0.45)q.spun=true;if(race.time-q.t<2.5)continue;INQ.splice(k,1);
+  const harmed=q.spun||v.offTrack>q.off0+0.4||v.dmg>q.dmg0+0.03||q.sev>8;const mitig=(race.time<25&&q.culprit.lap<=1)||q.sev<5;const pen=mitig?5:10;
+  const who=q.kind==='forcing'?'Empurrou '+v.d.c+' para fora da pista':'Causou colisão com '+v.d.c;
+  if(harmed){q.culprit.penalty+=pen;q.culprit.pp=(q.culprit.pp||0)+(pen>=10?3:2);if(q.culprit.isPlayer)race.toast('PENALIDADE +'+pen+' s',who);else if(v.isPlayer)race.toast(q.culprit.d.c+' PUNIDO','+'+pen+' s · '+(q.kind==='forcing'?'empurrou você para fora':'causou colisão'))}
+  else{q.culprit.reprimands=(q.culprit.reprimands||0)+1;if(q.culprit.isPlayer||v.isPlayer)race.toast('ADVERTÊNCIA',q.culprit.d.c+' · toque sem consequência')}}}
+/* empurrar para fora sem toque: vítima sai da pista com o rival colado ao lado vindo na direção dela */
+function checkForcing(){for(const v of race.cars){if(v.inPit)continue;const off=Math.abs(v.latNow||0)>HW+CAR_HW+0.15;const was=v.wasOffF;v.wasOffF=off;if(!off||was||race.time<5)continue;
+  for(const o of race.cars){if(o===v||o.inPit)continue;if(!(v.isPlayer||o.isPlayer))continue;let dd=(o.sIdx-v.sIdx);if(dd<-N/2)dd+=N;if(dd>N/2)dd-=N;dd*=T.ds;if(Math.abs(dd)>6)continue;
+    const n=T.n[v.sIdx];const side=Math.sign(v.latNow||0);const olat=(o.pos.x-T.p[v.sIdx].x)*n.x+(o.pos.z-T.p[v.sIdx].z)*n.z;if(Math.sign(olat-(v.latNow||0))===side)continue;   /* rival do lado de dentro */
+    const lv=(Math.cos(o.va)*n.x+Math.sin(o.va)*n.z)*o.v*side;if(lv>1.0&&Math.abs(olat-(v.latNow||0))<3.6&&!(o.lastInq&&race.time-o.lastInq<3)){o.lastInq=v.lastInq=race.time;v.forcedUntil=race.time+3;INQ.push({culprit:o,victim:v,t:race.time,sev:6,off0:v.offTrack-1,dmg0:v.dmg,kind:'forcing'});if(o.isPlayer||v.isPlayer)race.toast('INVESTIGAÇÃO',o.d.c+' pode ter empurrado '+v.d.c+' para fora')}}}}
+/* sair da pista e ganhar posição (jogador): devolver em 10 s ou +10 s */
+function checkAdvantage(c){const off=Math.abs(c.latNow||0)>HW+CAR_HW+0.15;const pos=race.order().indexOf(c);if(off&&!c.advOff){c.advOff=true;c.advPos=pos}
+  if(!off&&c.advOff){c.advOff=false;if(pos<c.advPos){c.giveBack={pos:c.advPos,until:race.time+10};race.toast('DEVOLVA A POSIÇÃO','Ganhou vantagem fora da pista · 10 s')}}
+  if(c.giveBack){if(pos>=c.giveBack.pos){c.giveBack=null;race.toast('POSIÇÃO DEVOLVIDA','Sem penalidade')}else if(race.time>c.giveBack.until){c.giveBack=null;c.penalty+=10;race.toast('PENALIDADE +10 s','Saiu da pista e ganhou vantagem')}}}
 /* limites de pista (jogador): as 4 rodas além da linha branca = volta anulada + aviso; a partir do 4º, +5 s */
-function trackLimits(c){const out=Math.abs(c.latNow||0)>HW+CAR_HW+0.15&&c.v>8;if(out&&!c.tlOut){c.tlCount=(c.tlCount||0)+1;c.lapOK=false;
-    if(c.tlCount<3)race.toast('LIMITE DE PISTA','Aviso '+c.tlCount+' · volta anulada');else if(c.tlCount===3)race.toast('BANDEIRA PRETA E BRANCA','Próxima infração: +5 s');else{c.penalty+=5;race.toast('PENALIDADE +5 s','Limites de pista')}}
-  c.tlOut=out}
+function trackLimits(c){const out=Math.abs(c.latNow||0)>HW+CAR_HW+0.15&&c.v>8;if(out&&!c.tlOut)c.tlPending=race.time;c.tlOut=out;
+  /* espera 0,6 s: se foi empurrado para fora (forcedUntil), não conta */
+  if(c.tlPending!=null&&race.time-c.tlPending>0.6){const forced=c.forcedUntil>c.tlPending-0.3;const t0=c.tlPending;c.tlPending=null;if(forced)return;
+    c.tlCount=(c.tlCount||0)+1;c.lapOK=false;void t0;
+    if(c.tlCount<3)race.toast('LIMITE DE PISTA','Aviso '+c.tlCount+' · volta anulada');else if(c.tlCount===3)race.toast('BANDEIRA PRETA E BRANCA','Próxima infração: +5 s');else{c.penalty+=5;race.toast('PENALIDADE +5 s','Limites de pista')}}}
 
 /* ======================= EFEITOS ======================= */
 /* faíscas do assoalho (prancha de titânio): compressões da pista, zebras e frenagem forte em alta */
@@ -743,8 +765,7 @@ const fx=(function(){const MAXP=600;const geo=new THREE.BufferGeometry();const p
       geo.attributes.position.needsUpdate=true;geo.attributes.aLife.needsUpdate=true;geo.attributes.aSize.needsUpdate=true}}})();
 
 /* ======================= CÂMERAS DE TV ======================= */
-const TVCAMS=[];for(const [cs] of CORNERS){const bi=idxAt(cs);const i=((bi-Math.round(60/T.ds))%N+N)%N;const p=T.p[i],n=T.n[i];const off=outsideOf(bi)*(HW+11);
-  TVCAMS.push({s:i*T.ds,pos:new THREE.Vector3(p.x+n.x*off,p.y+6.5,p.z+n.z*off)})}
+const TVCAMS=tvSpots().map(c=>({s:c.s,pos:new THREE.Vector3(c.x,c.y+9,c.z)}));   /* grua de 9 m */
 TVCAMS.push({s:T.L-300,pos:(()=>{const f=frameAt(T.L-300,-(HW+8));return new THREE.Vector3(f.x,f.y+3.2,f.z)})()});
 TVCAMS.sort((a,b)=>a.s-b.s);
 /* ======================= FÍSICA ======================= */
@@ -780,7 +801,9 @@ class Car{
     this.surf=surfMu;this.kerbBuzz=(this.kerbBuzz||0)-dt;this.onKerb=bump;this.latNow=lat;
     // aero
     const drsF=this.drsOpen?1:0;const CdA=1.05-0.2*drsF,ClA=CLA-0.9*drsF;
-    const drag=0.5*RHO*CdA*v*v, DF=0.5*RHO*ClA*v*v*(1-0.35*(this.wing||0));   /* asa dianteira danificada perde downforce */
+    /* vácuo (menos arrasto colado atrás na reta) e ar sujo (menos downforce colado atrás em curva) */
+    let tow=0,dirty=0;if(race&&race.carAheadLane&&v>20){const ah=race.carAheadLane(this,45);if(ah){const close=clamp(1-(ah.dist-8)/32,0,1);tow=0.30*close;dirty=0.25*clamp(1-(ah.dist-6)/22,0,1)*clamp(Math.abs(Ksm[this.sIdx])/0.006,0,1)}}this.tow=tow;this.dirty=dirty;
+    const drag=0.5*RHO*CdA*v*v*(1-tow), DF=0.5*RHO*ClA*v*v*(1-0.35*(this.wing||0))*(1-dirty);   /* asa dianteira danificada perde downforce */
     // pneu
     const tAvg=(this.temp[0]+this.temp[1]+this.temp[2]+this.temp[3])/4;const tf=clamp(1-Math.pow((tAvg-this.comp.opt)/70,2),0.55,1);
     const mu=MU0*this.comp.mu*tf*(1-0.28*this.wear)*surfMu*(1-0.25*this.dmg)*this.carPerf;
@@ -915,10 +938,14 @@ class AI{
     const ahead=race.carAheadSpatial(c,30);let target=RL[ti];this.follow=1;this.gapCap=1e9;
     /* tráfego: segue o carro da frente na mesma faixa com intervalo de ~0,22 s (+6,5 m entre eixos); tenta passar pelo lado livre */
     const lane=race.carAheadLane(c,50);
-    if(lane){const g=6.5+v*0.22;if(lane.dist<g+30)this.gapCap=Math.max(0,lane.v+(lane.dist-g)*0.8);
+    if(lane){const lb=lane.car.brake>0.3;const g=6.5+v*(lb?0.34:0.22);if(lane.dist<g+30)this.gapCap=Math.max(0,lane.v-(lb?2.5:0)+(lane.dist-g)*0.8);   /* líder freando: abre a distância */
       if((v-lane.v>-1&&lane.dist<26&&this.aggr>0.3&&race.time>13)||(v-lane.v>5&&lane.dist<40)){   /* desvia de carro lento/parado mesmo na largada */const side=lane.lat>0?-1:1;target=clamp(lane.lat+side*3.4,-HW+1.2,HW-1.2)}}
     /* largada: cada carro segue na sua fila do grid e só converge para a linha de corrida depois de ~7 s */
     if(this.gridLat==null)this.gridLat=myLat;if(race.time<13){const k=clamp((race.time-7)/6,0,1);target=lerp(this.gridLat,target,k*k)}
+    /* defesa: carro atrás chegando antes de uma freada -> fecha por dentro da próxima curva (um movimento só) */
+    if(race.time>13){const bh=race.carBehindLane(c,22);const iA=(i+Math.round(160/T.ds))%N;const brakeAhead=VPROF[iA]<v-12;
+      if(bh&&bh.v>v-1&&brakeAhead&&!(this.defendUntil>race.time)&&!(this.defendCool>race.time)){this.defendUntil=race.time+3;this.defendCool=race.time+8;this.defendSide=Math.sign(Ksm[(i+Math.round(200/T.ds))%N]||1)}
+      if(this.defendUntil>race.time)target=this.defendSide*(HW-2.3)}
     /* lado a lado: nunca fecha a porta, mantém 2,9 m de separação lateral */
     for(const o of race.cars){if(o===c||o.inPit)continue;let dd=(o.sIdx-c.sIdx);if(dd<-N/2)dd+=N;if(dd>N/2)dd-=N;dd*=T.ds;if(Math.abs(dd)>7)continue;
       const ol=(o.pos.x-p0.x)*n0.x+(o.pos.z-p0.z)*n0.z;const sep=myLat-ol;if(Math.abs(sep)<2.9){target=clamp(ol+(sep>=0?1:-1)*2.9,-HW+1.0,HW-1.0)}}
@@ -929,7 +956,7 @@ class AI{
     const steerMax=0.42/(1+v/22);const DF=0.5*RHO*CLA*v*v;const kLim0=MU0*c.carPerf*gf*(G+DF/c.mass)/(v*v+4);const bfrac=clamp(c.brake*1.05,0,0.95);const kLim=kLim0*Math.sqrt(1-bfrac*bfrac)*1.04;const sLim=Math.atan(kLim*WB);steerAng=clamp(steerAng,-sLim,sLim);c.steer=clamp(steerAng/steerMax,-1,1);
     // velocidade alvo
     let vt=1e9;const horizon=Math.round(Math.max(40,v*3.2)/T.ds);
-    for(let j=0;j<=horizon;j+=2){const ii=(i+j)%N;const vp=VPROF[ii]*Math.sqrt(this.skill*gf)*0.97*this.lapMul;const aB=0.8*MU0*this.skill*gf*(G+0.5*RHO*CLA*vp*vp/c.mass);const vb=Math.sqrt(vp*vp+2*aB*j*T.ds);if(vb<vt)vt=vb}
+    for(let j=0;j<=horizon;j+=2){const ii=(i+j)%N;const vp=VPROF[ii]*Math.sqrt(this.skill*gf)*0.97*this.lapMul;const aB=(lane&&lane.dist<30?0.68:0.8)*MU0*this.skill*gf*(G+0.5*RHO*CLA*vp*vp/c.mass);const vb=Math.sqrt(vp*vp+2*aB*j*T.ds);if(vb<vt)vt=vb}
     vt=Math.min(vt,this.gapCap);if(c.surf<0.7){vt=Math.min(vt,14);this.lat=lerp(this.lat,0,dt*2)}
     const err=vt-v;
     if(!(ahead&&ahead.dist<11&&v-ahead.v>0&&ahead.dlat<2.4)){c.throttle=clamp(err*0.6+0.1,0,1)*this.follow;const latUse=Math.min(0.85,Math.abs(kff)*v*v/(kLim0*(v*v+4)));const bMax=Math.sqrt(1-latUse*latUse)*0.95/1.05;c.brake=Math.min(clamp(-err*0.8,0,1),bMax)}
@@ -950,6 +977,7 @@ const race={state:'menu',time:0,laps:5,cars:[],player:null,fastest:null,fastestB
   order(){return this.cars.slice().sort((a,b)=>{if(a.finished&&b.finished)return a.finishT-b.finishT;if(a.finished!==b.finished)return a.finished?-1:1;return (b.lap*T.L+b.s)-(a.lap*T.L+a.s)})},
   carAhead(c){const o=this.order();const i=o.indexOf(c);return i>0?o[i-1]:null},
   gapTo(c,a){const cpi=Math.floor(c.s/T.L*96)%96;const mine=c.cp[cpi],his=a.cp[cpi];if(!mine||!his)return 99;if(his.lap>mine.lap)return 99;return mine.t-his.t},
+  carBehindLane(c,maxD){let best=null;const n=T.n[c.sIdx],p=T.p[c.sIdx];const myLat=(c.pos.x-p.x)*n.x+(c.pos.z-p.z)*n.z;for(const o of this.cars){if(o===c||o.inPit)continue;let d=(c.sIdx-o.sIdx);if(d<-N/2)d+=N;if(d>N/2)d-=N;d*=T.ds;if(d<=0.5||d>maxD)continue;const lat=(o.pos.x-p.x)*n.x+(o.pos.z-p.z)*n.z;if(Math.abs(lat-myLat)>3)continue;if(!best||d<best.dist)best={car:o,dist:d,lat,v:o.v}}return best},
   carAheadLane(c,maxD){let best=null;const n=T.n[c.sIdx],p=T.p[c.sIdx];const myLat=(c.pos.x-p.x)*n.x+(c.pos.z-p.z)*n.z;for(const o of this.cars){if(o===c||o.inPit)continue;let d=(o.sIdx-c.sIdx);if(d<-N/2)d+=N;if(d>N/2)d-=N;d*=T.ds;if(d<=0.5||d>maxD)continue;const lat=(o.pos.x-p.x)*n.x+(o.pos.z-p.z)*n.z;if(Math.abs(lat-myLat)>2.3)continue;if(!best||d<best.dist)best={car:o,dist:d,lat,v:o.v}}return best},
   carAheadSpatial(c,maxD){let best=null;for(const o of this.cars){if(o===c||o.inPit)continue;let d=(o.sIdx-c.sIdx);if(d<-N/2)d+=N;if(d>N/2)d-=N;d*=T.ds;if(d>0.5&&d<maxD){const n=T.n[c.sIdx],p=T.p[c.sIdx];const lat=(o.pos.x-p.x)*n.x+(o.pos.z-p.z)*n.z;const myLat=(c.pos.x-p.x)*n.x+(c.pos.z-p.z)*n.z;if(!best||d<best.dist)best={car:o,dist:d,lat,dlat:Math.abs(lat-myLat),v:o.v}}}return best},
 };
@@ -1019,8 +1047,8 @@ const cam={mode:0,pos:new THREE.Vector3(),look:new THREE.Vector3(),tv:null,tvT:0
 function updateCam(dt){const c=race.player;if(!c)return;const h=c.hd;const fwd=new THREE.Vector3(Math.cos(h),0,Math.sin(h));const spd=c.v;
   let tp,tl,fov;
   if(cam.mode===0){tp=c.pos.clone().addScaledVector(fwd,-(5.6+spd*0.02)).add(new THREE.Vector3(0,1.6+spd*0.004,0));tl=c.pos.clone().addScaledVector(fwd,6).add(new THREE.Vector3(0,0.5,0));fov=56+spd*0.11}
-  else if(cam.mode===1){c.mesh.updateMatrixWorld();tp=c.mesh.localToWorld(new THREE.Vector3(-0.15,1.62,0));tl=c.mesh.localToWorld(new THREE.Vector3(22,-0.1,0));fov=60}
-  else if(cam.mode===2){c.mesh.updateMatrixWorld();tp=c.mesh.localToWorld(new THREE.Vector3(0.6,0.95,0));tl=c.mesh.localToWorld(new THREE.Vector3(28,0.3,0));fov=78}
+  else if(cam.mode===1){c.mesh.updateMatrixWorld();tp=c.mesh.localToWorld(new THREE.Vector3(-0.15,1.62,0));tl=c.mesh.localToWorld(new THREE.Vector3(22,-0.1,0));fov=60+6*clamp((spd-30)/60,0,1)}
+  else if(cam.mode===2){c.mesh.updateMatrixWorld();tp=c.mesh.localToWorld(new THREE.Vector3(0.6,0.95,0));tl=c.mesh.localToWorld(new THREE.Vector3(28,0.3,0));fov=78+5*clamp((spd-30)/60,0,1)}
   else if(cam.mode===4){c.mesh.updateMatrixWorld();tp=c.mesh.localToWorld(new THREE.Vector3(2.35,0.5,0));tl=c.mesh.localToWorld(new THREE.Vector3(38,0.4,0));fov=80}
   else if(cam.mode===5){tp=c.pos.clone().addScaledVector(fwd,-(9.5+spd*0.03)).add(new THREE.Vector3(0,3.2+spd*0.005,0));tl=c.pos.clone().addScaledVector(fwd,8).add(new THREE.Vector3(0,0.6,0));fov=50+spd*0.08}
   else{const rel=t=>{let d=(t.s-c.s+T.L)%T.L;if(d>T.L/2)d-=T.L;return d};
@@ -1030,7 +1058,7 @@ function updateCam(dt){const c=race.player;if(!c)return;const h=c.hd;const fwd=n
   if(chase){const j=nearest(tp,c.sIdx);const pj=T.p[j],nj=T.n[j];const lat=(tp.x-pj.x)*nj.x+(tp.z-pj.z)*nj.z;const lim=HW+11;   /* câmera de perseguição nunca atravessa mureta */
     if(Math.abs(lat)>lim){const k=(Math.abs(lat)-lim)/Math.abs(lat);tp.lerp(new THREE.Vector3(c.pos.x,tp.y,c.pos.z),Math.min(1,k*1.05));tp.y=Math.max(tp.y,T.y[j]+1.2)}}const k=chase?1-Math.pow(0.0005,dt):1;cam.pos.lerp(tp,k);cam.look.lerp(tl,chase?Math.min(1,k*1.5):1);
   const onboard=cam.mode===1||cam.mode===2||cam.mode===4;const sh=onboard?0:(c.slip*0.05+(c.surf<0.7?0.04:0)+c.lock*0.03)*Math.min(1,spd/30)*(cam.mode===3?0:1);cam.pos.x+=(Math.random()-.5)*sh;cam.pos.y+=(Math.random()-.5)*sh*0.5;
-  camera.fov=lerp(camera.fov,fov,dt*4);camera.position.copy(cam.pos);camera.lookAt(cam.look);camera.updateProjectionMatrix();
+  camera.fov=lerp(camera.fov,fov,dt*4);if(window.GRADE_PASS)GRADE_PASS.uniforms.uSpd.value=cam.mode===3?0:clamp((spd-42)/45,0,1)*(cam.mode===0||cam.mode===5?0.6:1);camera.position.copy(cam.pos);camera.lookAt(cam.look);camera.updateProjectionMatrix();
   sun.target.position.copy(c.pos);sun.position.copy(c.pos).addScaledVector(SUNDIR,500)}
 /* ======================= ÁUDIO: V6 1.6 turbo híbrido =======================
    Síntese do ciclo do motor: 6 explosões a cada 2 voltas (720°), bancos com leve assimetria -> aspereza do V6.
@@ -1119,6 +1147,11 @@ function hud(dt){const c=race.player;if(!c)return;hudT+=dt;
     o.forEach((x,i)=>{let g='';const far=!(i<3||Math.abs(i-pi)<=1);if(i===0)g=x.finished?'VENC':'Líder';else{const a=o[i-1];if(x.finished&&a.finished)g='+'+(x.finishT-a.finishT).toFixed(1);else{const gp=race.gapTo(x,a);g=gp>=99?'+1 V':'+'+gp.toFixed(1)}}
       h+=`<div class="r${x.isPlayer?' me':''}${x.inPit?' pit':''}${far?' far':''}"><span class="p">${i+1}</span><span class="c" style="background:${x.team.c}"></span><span>${x.d.c}${x.penalty?'<i class="pen">+'+x.penalty+'</i>':''}</span><span class="g${x.drsOpen?' drs':''}">${x.inPit?'PIT':g}</span></div>`});
     $('tower').innerHTML=h;
+    {const pi=o.indexOf(race.player);const a=o[pi-1],b=o[pi+1];let g='';const pl=race.player;
+      if(a){const gp=race.gapTo(pl,a);g+=`<span class="up">▲ ${a.d.c} ${gp>=99?'+1V':'+'+Math.max(0.1,gp).toFixed(1)}</span>`}
+      if(pl.tow>0.05)g+='<span class="tow">VÁCUO</span>';
+      if(b){const gp=race.gapTo(b,pl);g+=`<span class="dn">▼ ${b.d.c} ${gp>=99?'-1V':'-'+Math.max(0.1,gp).toFixed(1)}</span>`}
+      $('gaps').innerHTML=race.state==='racing'?g:''}
     let ty='';for(const w of[0,1,2,3]){const t=c.temp[w];const col=t<75?'#4aa3ff':t<115?'#3ddc84':t<135?'#ffd23f':'#ff3b3b';ty+=`<div class="t" style="background:${col}">${Math.round(t)}°</div>`}
     ty+=`<div class="cmp"><span class="ring" style="--cc:${c.comp.col}">${c.comp.n}</span><span>${c.comp.full}<br><span style="color:var(--mut)">desgaste ${Math.round(c.wear*100)}% · paradas ${c.stops}</span></span></div>`;$('tyres').innerHTML=ty;
     drawMap()}
@@ -1134,10 +1167,10 @@ function step(dt){if(race.paused)return;race.time+=dt;
   if(race.state==='racing'&&!race.drsEnabled&&race.player&&race.order()[0].lap>=3){race.drsEnabled=true;race.toast('DRS LIBERADO','')}
   readInput(dt);
   for(const c of race.cars){if(c.ai)c.ai.drive(dt,race);c.update(dt,null,race.opt,race)}
-  if(race.state==='racing'&&race.player&&!race.player.inPit)trackLimits(race.player);
+  if(race.state==='racing'&&race.player&&!race.player.inPit){trackLimits(race.player);checkAdvantage(race.player)}
   // colisões: caixas orientadas (5,5 x 2,0 m), impulso no ponto de contato (restituição 0,15, atrito 0,35), giro pelo braço de alavanca, dano na asa
   const cs=race.cars;for(let a=0;a<cs.length;a++)for(let b=a+1;b<cs.length;b++){const A=cs[a],B=cs[b];if(A.inPit||B.inPit)continue;const hit=collideCars(A,B);if(hit)judgeContact(A,B,hit)}
-  checkInvestigations();
+  checkForcing();checkInvestigations();
   // fim de corrida
   if(race.state==='racing'){const allDone=race.cars.every(c=>c.finished);const leaderDone=race.cars.some(c=>c.finished);if(!race.endT&&leaderDone)race.endT=race.time+90;if(allDone||(race.endT&&race.time>race.endT)||(race.player.finished&&race.time>race.player.finishT+8)){race.state='finished';showResults()}}
 }
@@ -1152,8 +1185,8 @@ function tick(dt){
 const POST=!matchMedia('(pointer:coarse)').matches&&!!THREE.EffectComposer;let composer=null,smaaPass=null,bloomPass=null;
 if(POST){composer=new THREE.EffectComposer(renderer);composer.addPass(new THREE.RenderPass(scene,camera));bloomPass=new THREE.UnrealBloomPass(new THREE.Vector2(innerWidth,innerHeight),0.18,0.55,0.96);composer.addPass(bloomPass);composer.addPass(new THREE.ShaderPass(THREE.GammaCorrectionShader));
   /* gradação de cor de transmissão: contraste, saturação, sol levemente quente, vinheta */
-  composer.addPass(new THREE.ShaderPass({uniforms:{tDiffuse:{value:null}},vertexShader:'varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
-    fragmentShader:'uniform sampler2D tDiffuse;varying vec2 vUv;void main(){vec4 t=texture2D(tDiffuse,vUv);vec3 c=t.rgb;c=(c-.5)*1.07+.5;float l=dot(c,vec3(.2126,.7152,.0722));c=mix(vec3(l),c,1.1);c*=vec3(1.025,1.,.965);float d=distance(vUv,vec2(.5));c*=mix(1.,.8,smoothstep(.42,.86,d));gl_FragColor=vec4(clamp(c,0.,1.),t.a);}'}));smaaPass=new THREE.SMAAPass(innerWidth,innerHeight);composer.addPass(smaaPass);window.__dbg.composer=composer;window.__dbg.bloomPass=bloomPass;window.__dbg.smaaPass=smaaPass}
+  window.GRADE=composer.addPass(window.GRADE_PASS=new THREE.ShaderPass({uniforms:{tDiffuse:{value:null},uSpd:{value:0}},vertexShader:'varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
+    fragmentShader:'uniform sampler2D tDiffuse;uniform float uSpd;varying vec2 vUv;void main(){vec4 t=texture2D(tDiffuse,vUv);vec2 dir=vUv-.5;float m=smoothstep(.22,.75,length(dir))*uSpd;vec3 c=t.rgb;for(int k=1;k<6;k++)c+=texture2D(tDiffuse,vUv-dir*.014*float(k)*m).rgb;c/=6.;c=mix(t.rgb,c,step(.001,m));c=(c-.5)*1.07+.5;float l=dot(c,vec3(.2126,.7152,.0722));c=mix(vec3(l),c,1.1);c*=vec3(1.025,1.,.965);float d=distance(vUv,vec2(.5));c*=mix(1.,.8,smoothstep(.42,.86,d));gl_FragColor=vec4(clamp(c,0.,1.),t.a);}'}));smaaPass=new THREE.SMAAPass(innerWidth,innerHeight);composer.addPass(smaaPass);window.__dbg.composer=composer;window.__dbg.bloomPass=bloomPass;window.__dbg.smaaPass=smaaPass}
 let lastCW=0,lastCH=0;
 /* tamanho vem do canvas na tela (não de innerWidth): no celular o evento de resize chega antes do tamanho final ao girar ou com a barra do navegador */
 function resize(){const w=Math.max(1,canvas.clientWidth||innerWidth),h=Math.max(1,canvas.clientHeight||innerHeight);lastCW=w;lastCH=h;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();if(composer){const pr=renderer.getPixelRatio();composer.setPixelRatio(pr);composer.setSize(w,h);smaaPass.setSize(w*pr,h*pr)}}addEventListener('resize',resize);addEventListener('orientationchange',()=>setTimeout(resize,250));resize();
@@ -1168,7 +1201,7 @@ let selDriver='VER';
     if(!VPROF){buildProfile();colorRacingLine()}setup();if(MOBILE)race.cars.forEach(c=>{if(c!==race.player)c.mesh.traverse(o=>{if(o.isMesh)o.castShadow=false})});audio.start();checkRotate();renderer.compile(scene,camera);if(composer)composer.render();/* pré-compila shaders */lastT=performance.now();acc=0}})();
 function showResults(){const o=race.order();const r=$('res');let h='<div class="wrap"><div class="eyebrow">Classificação final · GP de São Paulo 2025 · '+race.laps+' voltas</div><h1>Resultado</h1><table><tr><th>Pos</th><th></th><th>Piloto</th><th>Equipe</th><th>Gap</th><th>Melhor volta</th><th>Paradas</th></tr>';
   const w=o[0];o.forEach((c,i)=>{const gap=i===0?'Vencedor':c.finished?'+'+(c.finishT-w.finishT).toFixed(3):'+'+(w.lap-c.lap)+' volta(s)';const fl=race.fastestBy===c?' fl':'';
-    h+=`<tr class="${c.isPlayer?'me':''}"><td class="n">${i+1}</td><td><span style="display:inline-block;width:5px;height:18px;background:${c.team.c}"></span></td><td>${c.d.n}${c.penalty?' <small style="color:var(--yellow)">+'+c.penalty+'s</small>':''}</td><td>${c.team.n}</td><td>${gap}</td><td class="${fl}">${fmt(c.best)}</td><td>${c.stops}</td></tr>`});
+    h+=`<tr class="${c.isPlayer?'me':''}"><td class="n">${i+1}</td><td><span style="display:inline-block;width:5px;height:18px;background:${c.team.c}"></span></td><td>${c.d.n}${c.penalty?' <small style="color:var(--yellow)">+'+c.penalty+'s</small>':''}${c.reprimands?' <small style="color:var(--mut)">'+c.reprimands+' adv.</small>':''}</td><td>${c.team.n}</td><td>${gap}</td><td class="${fl}">${fmt(c.best)}</td><td>${c.stops}</td></tr>`});
   h+='</table><p class="foot">Volta mais rápida: '+(race.fastestBy?race.fastestBy.d.n+' · '+fmt(race.fastest):'--')+'. Largada do grid: P'+race.player.gridPos+'.</p><button class="start" id="again">Nova corrida</button></div>';
   r.innerHTML=h;r.classList.remove('hidden');$('hud').classList.add('hidden');$('again').onclick=()=>{r.classList.add('hidden');$('menu').classList.remove('hidden');race.state='menu'}}
 })();
