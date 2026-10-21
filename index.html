@@ -57,7 +57,7 @@ h1 span{color:var(--red)}
 .tower .g{text-align:right;color:var(--mut);font-size:11px}
 .gaps{position:absolute;top:calc(max(10px,env(safe-area-inset-top,0px)) + 62px);left:50%;transform:translateX(-50%);display:flex;gap:6px;font-family:var(--display);font-weight:700;font-size:14px}
 .gaps span{background:var(--panel);border-radius:4px;padding:3px 9px}.gaps .up{color:#ff6b6b}.gaps .dn{color:#3ddc84}.gaps .tow{color:#47c7fc}
-@media (max-height:520px){.gaps{top:calc(max(6px,env(safe-area-inset-top,0px)) + 40px);font-size:12px}}
+@media (max-height:520px){.gaps{top:calc(max(6px,env(safe-area-inset-top,0px)) + 56px);font-size:11px}.gaps span{padding:2px 7px}}
 .tower .pen{color:var(--yellow);font-style:normal;font-size:10px;margin-left:3px}
 .tower .g.drs{color:var(--green)}
 .timing{position:absolute;top:max(10px,env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);background:var(--panel);border-radius:4px;padding:6px 14px;display:flex;gap:18px;align-items:center;font-size:13px}
@@ -122,7 +122,7 @@ tr.me td{background:rgba(255,255,255,.08)}
 @media (max-height:520px){.tower{width:128px;font-size:11px}.tower .r{grid-template-columns:18px 3px 30px 1fr;padding:1px 5px}.tower .r.far{display:none}.tower .hd{font-size:11px;padding:2px 6px}
   #map{width:96px;height:96px}.tyres{display:none}.timing{gap:10px;padding:3px 10px}.timing > div:nth-child(n+3){display:none}.timing .lap{font-size:16px}.timing .cur{font-size:18px;min-width:84px}.timing small{font-size:8px}.timing .sec i{width:18px;height:4px}
   .dash{gap:6px;padding:4px 12px 3px;background:rgba(10,12,18,.55)}.dash .col{display:none}.dash .gear{font-size:34px;width:30px}.dash .spd{font-size:28px;min-width:56px}.rpm i{width:7px;height:4px}.rpm{top:-7px}
-  .msg{transform:translate(-50%,-50%) scale(.7)}
+  .msg{transform:translate(-50%,-50%) scale(.55);top:30%}
   #touch button{width:68px;height:68px;font-size:16px}#touch .l,#touch .r,#touch .b,#touch .a{bottom:calc(16px + env(safe-area-inset-bottom,0px))}
   #touch .r{left:calc(max(14px,env(safe-area-inset-left,0px)) + 80px)}#touch .b{right:calc(max(14px,env(safe-area-inset-right,0px)) + 80px)}
   #touch .drs{bottom:calc(96px + env(safe-area-inset-bottom,0px));width:54px;height:54px;font-size:13px}#touch .cam{top:calc(116px + env(safe-area-inset-top,0px));width:54px;height:36px}}
@@ -273,7 +273,7 @@ const CORNERS=(()=>{const W=Math.round(70/T.ds),pk=[];for(let i=0;i<N;i++){const
   return pk.map((i,k)=>[i*T.ds,CORNER_NAMES[k]||('Curva '+(k+1))])})();
 const S1=0.26*T.L,S2=0.70*T.L;
 const DRS_ZONES=[{det:430,from:720,to:1300},{det:3560,from:3990,to:T.L+230}];   /* Reta Oposta e reta dos boxes */
-const PIT={entry:T.L-420,exit:300};
+const PIT={entry:T.L-300,exit:230};   /* ~530 m de pit lane: ~26 s com a parada (real ~25-28 s) */
 /* pit lane: acompanha a reta dos boxes pelo lado dos boxes (-n), afastando 3 -> 15 m na entrada e voltando na saída */
 const pitPts=(()=>{const out=[];const s0=PIT.entry,s1=T.L+PIT.exit;for(let s=s0;s<=s1;s+=20){const r=Math.min(1,(s-s0)/140,(s1-s)/160);const lat=-(HW+3+12*(r*r*(3-2*r)));const i=idxAt(s);const p=T.p[i],n=T.n[i];out.push(new THREE.Vector3(p.x+n.x*lat,0,p.z+n.z*lat))}return out})();
 const pitCurve=new THREE.CatmullRomCurve3(pitPts,false,'catmullrom',.5); pitCurve.arcLengthDivisions=800;
