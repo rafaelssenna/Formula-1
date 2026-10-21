@@ -289,7 +289,7 @@ function nearest(pos,hint){let bi=hint,bd=1e9;for(let j=-40;j<=40;j++){const i=(
 const canvas=$('gl');
 const MOBILE=matchMedia('(pointer:coarse)').matches;
 const renderer=new THREE.WebGLRenderer({canvas,antialias:true,powerPreference:'high-performance'});
-renderer.setPixelRatio(Math.min(devicePixelRatio,MOBILE?1.25:2));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));   /* celular também começa em 2x (tela 3x com 1,25 ficava embaçada); o DYN baixa se faltar GPU */renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
 renderer.outputEncoding=THREE.sRGBEncoding;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.0;
 const scene=new THREE.Scene();scene.fog=new THREE.Fog(0xd3e1f0,1400,7000);scene.background=new THREE.Color(0xd3e1f0);
 const camera=new THREE.PerspectiveCamera(58,1,0.2,6000);
@@ -612,7 +612,7 @@ function tintedMaterial(mat,team){const f=CAR_TINT[team];if(!f||!mat.map||!mat.m
   const im=mat.map.image;const c=document.createElement('canvas');c.width=im.width;c.height=im.height;const x=c.getContext('2d');x.filter=f;x.drawImage(im,0,0);
   const t=new THREE.CanvasTexture(c);t.flipY=mat.map.flipY;t.encoding=mat.map.encoding;t.wrapS=mat.map.wrapS;t.wrapT=mat.map.wrapT;t.anisotropy=8;
   const m=mat.clone();m.map=t;return TINT_CACHE[key]=m}
-function carMeshGLTF(d){const M=MODELS[CAR_MODEL[d.t]];if(!MODELS.ready||!M)return null;const LV=(MOBILE?[['lo',0],['vlo',35]]:[['hi',0],['lo',48],['vlo',150]]).filter(([k])=>M[k]);if(!LV.length)return null;
+function carMeshGLTF(d,lv){const M=MODELS[CAR_MODEL[d.t]];if(!MODELS.ready||!M)return null;const LV=(lv||(MOBILE?[['lo',0],['vlo',35]]:[['hi',0],['lo',48],['vlo',150]])).filter(([k])=>M[k]);if(!LV.length)return null;
   const build=src=>{const s=src.clone(true);s.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=false;o.material=tintedMaterial(o.material,d.t);o.material.envMapIntensity=1;if(MOBILE&&o.material.isMeshPhysicalMaterial){const a=o.material;const k='std:'+a.uuid;o.material=TINT_CACHE[k]||(TINT_CACHE[k]=new THREE.MeshStandardMaterial({map:a.map,roughnessMap:a.roughnessMap,metalnessMap:a.metalnessMap,color:a.color,roughness:a.roughness,metalness:a.metalness,envMapIntensity:1}))}}});
     s.updateMatrixWorld(true);const wheels=['wheel_FL','wheel_FR','wheel_RL','wheel_RR'].map(n=>{const node=s.getObjectByName(n);if(!node)return null;const c=new THREE.Box3().setFromObject(node).getCenter(new THREE.Vector3());s.worldToLocal(c);const wc=node.userData.wheelCenter;if(wc){c.y=wc[0];c.z=wc[1]}   // centro do anel do pneu gravado em prepare-car.mjs
       const pivot=new THREE.Group();pivot.position.copy(c);s.add(pivot);const spin=new THREE.Group();pivot.add(spin);spin.attach(node);pivot.userData.spin=spin;return pivot});
@@ -634,6 +634,10 @@ function carMeshGLTF(d){const M=MODELS[CAR_MODEL[d.t]];if(!MODELS.ready||!M)retu
   const rl=new THREE.Mesh(new THREE.BoxGeometry(0.05,0.1,0.18),new THREE.MeshBasicMaterial({color:0x3a0606,toneMapped:false}));rl.position.set(-2.62,0.6,0);g.add(rl);
   return{g,drs:null,wheels,mat:null,blurMat,glowMat,rearLight:rl,discs:built.map(b=>b.s.userData.disc).filter(Boolean),glows:built.map(b=>b.s.userData.glow).filter(Boolean)}}
 loadModels();
+/* celular: só o carro do jogador ganha o modelo completo (textura 2k); com o leve de 512 px ele fica embaçado de perto */
+async function upgradePlayerCar(){const c=race.player;if(!MOBILE||!c)return;const k=CAR_MODEL[c.d.t];const M=MODELS[k];if(!M)return;
+  if(!M.hi){try{M.hi=bakeCarModel((await loadCarGLTF(`assets/cars/${k}_hi.json`)).scene,false)}catch(e){console.warn('hi',e);return}}
+  if(race.player!==c)return;const m=carMeshGLTF(c.d,[['hi',0],['lo',40]]);if(!m)return;const p=c.mesh.position.clone(),r=c.mesh.rotation.clone();c.setMesh(m);c.mesh.position.copy(p);c.mesh.rotation.copy(r)}
 
 /* ======================= DESEMPENHO =======================
    Cenário parado vira poucos objetos: junta malhas com o mesmo material (assinatura igual) em blocos de 500 m
@@ -678,7 +682,9 @@ function bakeCarModel(root,staticWheels){root.updateMatrixWorld(true);const inv=
 /* resolução dinâmica: mantém ~58 fps baixando/subindo a escala de pixels */
 const DYN={pr:0,max:0,acc:0,n:0,last:0};function dynRes(){const now=performance.now();const dt=(now-DYN.last)/1000;DYN.last=now;if(document.hidden||dt>0.25||dt<=0)return;   /* aba oculta ou travada isolada não contam */
   if(!DYN.max){DYN.max=renderer.getPixelRatio();DYN.pr=DYN.max}DYN.acc+=dt;DYN.n++;if(DYN.acc<1.5)return;const avg=DYN.acc/DYN.n;DYN.acc=0;DYN.n=0;
-  let pr=DYN.pr;if(avg>1/50&&pr>0.6)pr=Math.max(0.6,pr-0.12);else if(avg<1/58&&pr<DYN.max)pr=Math.min(DYN.max,pr+0.06);if(Math.abs(pr-DYN.pr)>0.01){DYN.pr=pr;renderer.setPixelRatio(pr);lastCW=-1}}
+  /* teto de quadros (iPhone em modo pouca energia = 30 fps): se baixar a resolução não acelerou, volta e trava ali — senão desce até o mínimo à toa e fica embaçado */
+  if(DYN.tried){const t=DYN.tried;DYN.tried=null;if(avg>t.avg*0.93){DYN.floor=t.pr;DYN.pr=t.pr;renderer.setPixelRatio(t.pr);lastCW=-1;return}}
+  const lo=Math.max(DYN.floor||0,MOBILE?0.9:0.6);let pr=DYN.pr;if(avg>1/50&&pr>lo){pr=Math.max(lo,pr-0.12);DYN.tried={pr:DYN.pr,avg}}else if(avg<1/58&&pr<DYN.max)pr=Math.min(DYN.max,pr+0.06);if(Math.abs(pr-DYN.pr)>0.01){DYN.pr=pr;renderer.setPixelRatio(pr);lastCW=-1}else DYN.tried=null}
 
 /* grid de largada pintado: colchete branco na frente de cada posição (mesma regra do setup) */
 (function gridMarks(){const wm=new THREE.MeshStandardMaterial({color:0xf2f2f2,roughness:.6,polygonOffset:true,polygonOffsetFactor:-1});
@@ -782,7 +788,8 @@ class Car{
     this.setTyres(compound);this.lap=0;this.sIdx=0;this.s=0;this.prevS=0;this.lapStart=0;this.cur=[0,0,0];this.secT=[null,null,null];this.bestSec=[null,null,null];this.best=null;this.last=null;this.sector=0;
     this.cp=new Array(96).fill(null);this.finished=false;this.finishT=null;this.inPit=false;this.pitReq=false;this.pitU=0;this.pitStop=0;this.pitDone=false;this.stops=0;this.compUsed=new Set([compound]);
     this.slip=0;this.lock=0;this.spin=0;this.surf=1;this.ai=null;this.penalty=0;this.dmg=0;this.offTrack=0;this.lapOK=true;
-    const m=carMeshGLTF(this.d)||carMesh(this.d);this.mesh=m.g;this.drsMesh=m.drs;this.wheels=m.wheels;this.blurMat=m.blurMat||null;this.glowMat=m.glowMat||null;this.rearLight=m.rearLight||null;this.discs=m.discs||[];this.glows=m.glows||[];if(this.blurMat)this.blurMat.map=blurTex(this.compKey);const bs=new THREE.Mesh(BLOB_GEO,BLOB_MAT);bs.position.set(0,0.03,0);bs.renderOrder=1;this.mesh.add(bs);scene.add(this.mesh)}
+    this.setMesh(carMeshGLTF(this.d)||carMesh(this.d))}
+  setMesh(m){if(this.mesh)scene.remove(this.mesh);this.mesh=m.g;this.drsMesh=m.drs;this.wheels=m.wheels;this.blurMat=m.blurMat||null;this.glowMat=m.glowMat||null;this.rearLight=m.rearLight||null;this.discs=m.discs||[];this.glows=m.glows||[];if(this.blurMat)this.blurMat.map=blurTex(this.compKey);const bs=new THREE.Mesh(BLOB_GEO,BLOB_MAT);bs.position.set(0,0.03,0);bs.renderOrder=1;this.mesh.add(bs);scene.add(this.mesh);if(this.compKey&&this.wheels)setTyreColor(this)}
   setTyres(c){this.comp=COMPOUNDS[c];this.compKey=c;this.wear=0;this.temp=[85,85,85,85];this.compUsed&&this.compUsed.add(c);if(this.wheels)setTyreColor(this)}
   get mass(){return 798+this.fuel}
   place(s,lat){const i=idxAt(s);this.sIdx=i;this.s=s;this.prevS=s;const p=T.p[i],n=T.n[i];this.pos.set(p.x+n.x*lat,p.y,p.z+n.z*lat);this.hd=Math.atan2(T.t[i].z,T.t[i].x);this.va=this.hd;this.v=0}
@@ -1199,7 +1206,7 @@ let selDriver='VER';
   for(const id of['laps','diff','tyre','camsel'])$(id).addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;$(id).querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b))});
   $('go').onclick=()=>{const v=id=>$(id).querySelector('.on').dataset.v;race.opt={driver:selDriver,laps:+v('laps'),diff:+v('diff'),tyre:v('tyre'),tc:$('aTC').checked,abs:$('aABS').checked,autoGear:$('aGear').checked,line:$('aLine').checked,steerAssist:$('aSteer').checked,autoGas:$('aAuto').checked,brakeAssist:$('aBrake').checked};
     race.laps=race.opt.laps;rlMesh.visible=race.opt.line;cam.mode=+v('camsel');canvas.setAttribute('tabindex','0');canvas.focus();$('menu').classList.add('hidden');$('res').classList.add('hidden');$('hud').classList.remove('hidden');race.paused=false;race.endT=null;race.goT=0;
-    if(!VPROF){buildProfile();colorRacingLine()}setup();if(MOBILE)race.cars.forEach(c=>{if(c!==race.player)c.mesh.traverse(o=>{if(o.isMesh)o.castShadow=false})});audio.start();checkRotate();renderer.compile(scene,camera);if(composer)composer.render();/* pré-compila shaders */lastT=performance.now();acc=0}})();
+    if(!VPROF){buildProfile();colorRacingLine()}setup();upgradePlayerCar();if(MOBILE)race.cars.forEach(c=>{if(c!==race.player)c.mesh.traverse(o=>{if(o.isMesh)o.castShadow=false})});audio.start();checkRotate();renderer.compile(scene,camera);if(composer)composer.render();/* pré-compila shaders */lastT=performance.now();acc=0}})();
 function showResults(){const o=race.order();const r=$('res');let h='<div class="wrap"><div class="eyebrow">Classificação final · GP de São Paulo 2025 · '+race.laps+' voltas</div><h1>Resultado</h1><table><tr><th>Pos</th><th></th><th>Piloto</th><th>Equipe</th><th>Gap</th><th>Melhor volta</th><th>Paradas</th></tr>';
   const w=o[0];o.forEach((c,i)=>{const gap=i===0?'Vencedor':c.finished?'+'+(c.finishT-w.finishT).toFixed(3):'+'+(w.lap-c.lap)+' volta(s)';const fl=race.fastestBy===c?' fl':'';
     h+=`<tr class="${c.isPlayer?'me':''}"><td class="n">${i+1}</td><td><span style="display:inline-block;width:5px;height:18px;background:${c.team.c}"></span></td><td>${c.d.n}${c.penalty?' <small style="color:var(--yellow)">+'+c.penalty+'s</small>':''}${c.reprimands?' <small style="color:var(--mut)">'+c.reprimands+' adv.</small>':''}</td><td>${c.team.n}</td><td>${gap}</td><td class="${fl}">${fmt(c.best)}</td><td>${c.stops}</td></tr>`});

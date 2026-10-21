@@ -103,7 +103,7 @@ Aceite: excentricidade de roda abaixo de 15 mm no modelo leve e 10 mm no complet
 - `mergeStatic()` roda depois de montar o cenário: junta malhas paradas com o mesmo material (pela assinatura do material, não pelo objeto) em blocos de 500 m. Objeto que muda em jogo leva `userData.noMerge=true` (luzes da largada, linha de corrida, céu, água).
 - Não criar material/textura repetidos: `textTex` tem cache; arquibancada usa um material de torcida só (repetição no UV).
 - Carros: `bakeCarModel()` junta as peças na carga (carroceria = 1 malha, cada roda = 1). Três níveis de detalhe: hi (perto), lo (48 m), vlo (~15 mil triângulos, 150 m). Celular: lo e vlo (35 m).
-- Celular: resolução ×1,25 com ajuste dinâmico (cai até 0,6 se ficar abaixo de 50 fps; ignora aba oculta), sombra só do carro do jogador (1024), pintura sem verniz, árvores e prédios pela metade, terreno mais simples.
+- Celular: resolução ×2 com ajuste dinâmico (cai até 0,9 se ficar abaixo de 50 fps; ignora aba oculta; se baixar não acelerar, é teto de quadros — modo pouca energia do iPhone = 30 fps — e volta). Carro do jogador com o modelo completo (textura 2k), carregado na largada, sombra só do carro do jogador (1024), pintura sem verniz, árvores e prédios pela metade, terreno mais simples.
 - Medir com `renderer.info` antes e depois de qualquer mudança visual.
 | Medida | PC | Celular |
 |---|---|---|
