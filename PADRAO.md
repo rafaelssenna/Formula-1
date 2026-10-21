@@ -83,7 +83,7 @@ Aceite: excentricidade de roda abaixo de 15 mm no modelo leve e 10 mm no complet
 - Faixa de grama colada na pista vai só até a mureta (HW + 15,2 m). Faixa larga invade trechos vizinhos.
 - Plano de chão distante fica abaixo do ponto mais baixo da pista.
 - Cenário de fundo: prédios instanciados (cidade), nunca morros lisos.
-- Árvores e prédios: `InstancedMesh`. Cores hex sempre passam por `srgb()`.
+- Árvores e prédios: `InstancedMesh`. Cores hex sempre passam por `srgb()`. Copa: normais de esfera, sombra embaixo (cor de vértice) e textura de folhas vazada (`alphaTest`, dupla face): contorno de folhagem, nunca bola lisa.
 - Nada a menos de HW + 26 m da pista além de muretas, placas, zebras e área de escape.
 
 ## 5. Câmeras
