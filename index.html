@@ -377,11 +377,13 @@ const wallTex=canvasTex(256,64,(x,w,h)=>{const g=x.createLinearGradient(0,0,0,h)
   x.fillStyle='rgba(60,60,60,.55)';x.fillRect(0,0,2,h);x.fillStyle='rgba(0,0,0,.12)';x.fillRect(0,h*0.55,w,2);x.fillStyle='rgba(40,30,20,.18)';for(let k=0;k<30;k++)x.fillRect(Math.random()*w,h*0.8+Math.random()*h*0.2,3+Math.random()*12,2)});
 const tecTex=canvasTex(256,64,(x,w,h)=>{for(let b=0;b<2;b++){const x0=b*w/2;x.fillStyle=b?'#f2f2f2':'#c8102e';x.fillRect(x0,0,w/2,h);const g=x.createLinearGradient(x0,0,x0+w/2,0);g.addColorStop(0,'rgba(0,0,0,.28)');g.addColorStop(.12,'rgba(0,0,0,0)');g.addColorStop(.88,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(0,0,0,.28)');x.fillStyle=g;x.fillRect(x0,0,w/2,h);
     x.fillStyle='rgba(0,0,0,.18)';x.fillRect(x0,h*.48,w/2,3);x.fillStyle='rgba(255,255,255,.18)';x.fillRect(x0,2,w/2,3)}x.fillStyle='#1b1b1b';x.fillRect(0,0,3,h);x.fillRect(w/2-1,0,3,h)});
+function WALLOK(i,side){return !WALLOK.m||WALLOK.m[side][i]}
 (function barriers(){const wallM=new THREE.MeshStandardMaterial({map:wallTex,roughness:.9,side:THREE.DoubleSide}),tecM=new THREE.MeshStandardMaterial({map:tecTex,roughness:.7,side:THREE.DoubleSide});
   const posts=[];
   for(const side of[-1,1]){const off=side*(HW+14.6);
     /* por dentro de grampo fechado (T1 de Sakhir) a linha da mureta cruza a saída da curva: ali não tem mureta */
     const WOK=new Array(N);for(let j=0;j<N;j++){const p=T.p[j],n=T.n[j];WOK[j]=trackDist(p.x+n.x*off,p.z+n.z*off,40)>HW+6}
+    (WALLOK.m=WALLOK.m||{})[side]=WOK;
     /* duas faixas: concreto (some nas áreas de escape) e TecPro (só nelas) — altura zero onde não se aplica */
     for(const kind of['wall','tec']){const pos=[],uv=[],idx=[];for(let i=0;i<=N;i++){const j=i%N,p=T.p[j],n=T.n[j];const run=isRunoff(j);const on=(kind==='tec'?run:!run)&&WOK[j];const top=on?(kind==='tec'?1.05:1.15):-0.2;
         pos.push(p.x+n.x*off,p.y-0.2,p.z+n.z*off,p.x+n.x*off,p.y+top,p.z+n.z*off);const u=i*T.ds/(kind==='tec'?2.0:4.0);uv.push(u,0,u,1);if(i<N){const k=i*2;idx.push(k,k+1,k+2,k+1,k+3,k+2)}}
@@ -485,7 +487,10 @@ for(const [s,len,t,roof] of[[760,220,5,true],[1560,160,4,true],[2220,120,3,false
     const fd=frameAt(z.det,-(HW+3.4));const bd=new THREE.Mesh(new THREE.BoxGeometry(.1,1.0,1.6),new THREE.MeshBasicMaterial({map:textTex('DETECÇÃO','#111','#fff',256,96)}));bd.position.set(fd.x,fd.y+1.2,fd.z);bd.rotation.y=fd.ry;scene.add(bd)}
   // placas de patrocínio sobre os muros nas retas
   const ads=['GULF AIR','BAHRAIN','SAKHIR','F1','PIRELLI','ROLEX','DHL','AWS','HEINEKEN','CRYPTO.COM','QATAR AIRWAYS','MSC'];const adCol=['#e10600','#0b1a33','#00a19c','#111','#ffd400','#1b5e20','#d40511','#232f3e','#0b6b2c','#0a2540','#5c0632','#0d2a4a'];
-  for(let s=0,k=0;s<T.L;s+=70,k++){const i=idxAt(s);if(isRunoff(i))continue;for(const side of[-1,1]){const f=frameAt(s,side*(HW+14.6));const m=new THREE.Mesh(new THREE.BoxGeometry(60,1.0,.12),new THREE.MeshBasicMaterial({map:textTex(ads[(k+side+12)%12],adCol[(k+side+12)%12],'#fff',2048,96)}));m.position.set(f.x,f.y+1.7,f.z);m.rotation.y=f.ry;scene.add(m)}}
+  /* todas as placas numa textura só (atlas 12 faixas): um material, o mergeStatic junta tudo em poucas chamadas */
+  const adAtlas=canvasTex(2048,96*12,(x,W)=>{for(let q=0;q<12;q++){x.fillStyle=adCol[q];x.fillRect(0,q*96,W,96);x.fillStyle='#fff';x.font='900 60px sans-serif';x.textAlign='center';x.textBaseline='middle';x.fillText(ads[q],W/2,q*96+50)}});adAtlas.wrapS=adAtlas.wrapT=THREE.ClampToEdgeWrapping;const adMat=new THREE.MeshBasicMaterial({map:adAtlas});
+  const adGeo=[];for(let q=0;q<12;q++){const g=new THREE.BoxGeometry(60,1.0,.12);const uv=g.attributes.uv;for(let j=0;j<uv.count;j++)uv.setY(j,1-(q+1)/12+uv.getY(j)/12);adGeo.push(g)}
+  for(let s=0,k=0;s<T.L;s+=70,k++){const i=idxAt(s);if(isRunoff(i))continue;for(const side of[-1,1]){if(!WALLOK(i,side))continue;const f=frameAt(s,side*(HW+14.6));const m=new THREE.Mesh(adGeo[(k+side+12)%12],adMat);m.position.set(f.x,f.y+1.7,f.z);m.rotation.y=f.ry;scene.add(m)}}
   // pilhas de pneus nas curvas (instanciadas)
   (function tyres(){const geo=new THREE.CylinderGeometry(.36,.36,.95,12);const m=new THREE.MeshStandardMaterial({color:0xffffff,roughness:.92});const list=[];const RUB=new THREE.Color(0x141414),WH=new THREE.Color(0xe8e8e8),RD=new THREE.Color(0xc41212);
     for(const side of[-1,1])for(let i=0;i<N;i+=5){if(!isRunoff(i)||outsideOf(i)!==side)continue;const p=T.p[i],n=T.n[i];for(let r=0;r<3;r++){const band=Math.floor(i*T.ds/6)%4;list.push([p.x+n.x*side*(HW+13.6-r*0.75),p.y+0.47,p.z+n.z*side*(HW+13.6-r*0.75),r===2?(band===0?WH:band===2?RD:RUB):RUB])}}

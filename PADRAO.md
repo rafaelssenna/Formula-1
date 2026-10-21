@@ -109,7 +109,7 @@ Aceite: excentricidade de roda abaixo de 15 mm no modelo leve e 10 mm no complet
 - Medir com `renderer.info` antes e depois de qualquer mudança visual.
 | Medida | PC | Celular |
 |---|---|---|
-| Chamadas de desenho | ~300 | 31–50 |
+| Chamadas de desenho | ~300 | 25–102 (placas num atlas só) |
 | Triângulos | ~3 milhões | 340–420 mil |
 
 ## 5d. Cenário de Sakhir (Bahrein)
