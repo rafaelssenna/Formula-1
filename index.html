@@ -713,34 +713,37 @@ function collideCars(A,B){const dx0=B.pos.x-A.pos.x,dz0=B.pos.z-A.pos.z;if(dx0*d
   const vA={x:Math.cos(A.va)*A.v-wA*rA.z,z:Math.sin(A.va)*A.v+wA*rA.x},vB={x:Math.cos(B.va)*B.v-wB*rB.z,z:Math.sin(B.va)*B.v+wB*rB.x};
   const vr={x:vB.x-vA.x,z:vB.z-vA.z};const vn=vr.x*n.x+vr.z*n.z;if(vn>=0)return{n,vn:0,px,pz,j:0};
   const cA=rA.x*n.z-rA.z*n.x,cB=rB.x*n.z-rB.z*n.x;const mA=A.mass,mB=B.mass;
-  const j=-(1+0.15)*vn/(1/mA+1/mB+cA*cA/CAR_I+cB*cB/CAR_I);
-  const t={x:-n.z,z:n.x};const vt=vr.x*t.x+vr.z*t.z;const jt=clamp(-vt/(1/mA+1/mB),-0.35*j,0.35*j);
+  const j=-(1+0.05)*vn/(1/mA+1/mB+cA*cA/CAR_I+cB*cB/CAR_I);   /* fibra de carbono amassa: quase não quica */
+  const t={x:-n.z,z:n.x};const vt=vr.x*t.x+vr.z*t.z;const jt=clamp(-vt/(1/mA+1/mB),-0.2*j,0.2*j);
   const Jx=n.x*j+t.x*jt,Jz=n.z*j+t.z*jt;
   const apply=(C,r,sgn,m)=>{let vx=Math.cos(C.va)*C.v+sgn*Jx/m,vz=Math.sin(C.va)*C.v+sgn*Jz/m;C.v=Math.hypot(vx,vz);if(C.v>0.5)C.va=Math.atan2(vz,vx);
-    const tq=(r.x*Jz-r.z*Jx)*sgn;C.yawRate=clamp((C.yawRate||0)+tq/CAR_I,-6,6)};
+    const tq=(r.x*Jz-r.z*Jx)*sgn;C.yawRate=clamp((C.yawRate||0)+tq/(CAR_I*1.6),-3,3)};   /* pneus seguram o carro: toque leve só balança */
   apply(A,rA,-1,mA);apply(B,rB,1,mB);
   /* dano: asa dianteira se o contato foi na frente (> 1,9 m do centro), lateral/traseira leve */
-  const dv=Math.abs(vn);for(const[C,bx,p]of[[A,a,rA],[B,b,rB]]){const lon=p.x*bx.f.x+p.z*bx.f.z;const w=lon>1.9?0.07:0.025;if(dv>2.5)C.dmg=Math.min(0.5,C.dmg+dv*w*0.2);if(dv>4&&lon>1.9)C.wing=Math.min(1,(C.wing||0)+(dv-4)*0.06);   /* asa quebra acima de ~14 km/h de impacto frontal */
+  const dv=Math.abs(vn);for(const[C,bx,p]of[[A,a,rA],[B,b,rB]]){const lon=p.x*bx.f.x+p.z*bx.f.z;const w=lon>1.9?0.07:0.025;if(dv>4)C.dmg=Math.min(0.5,C.dmg+(dv-2)*w*0.2);if(dv>5&&lon>1.9)C.wing=Math.min(1,(C.wing||0)+(dv-5)*0.06);   /* asa quebra acima de ~18 km/h de impacto frontal; raspadinha não estraga o carro */
     if(dv>3)C.forcedUntil=race.time+2;if(C.isPlayer&&dv>2&&navigator.vibrate)try{navigator.vibrate(Math.min(250,30+dv*15))}catch(e){}}
   return{n,vn:dv,px,pz,j}}
 /* comissários: quem causou o toque? quem bateu por trás, ou quem se moveu lateralmente pra cima do outro. Pena só se o outro foi prejudicado. */
 const INQ=[];
-function judgeContact(A,B,h){if(window.__dbg&&window.__dbg.onContact)window.__dbg.onContact(A,B,h);if(h.vn<2.2||race.state!=='racing')return;const pair=[A,B];if(pair.some(c=>c.lastInq&&race.time-c.lastInq<3))return;
+function judgeContact(A,B,h){if(window.__dbg&&window.__dbg.onContact)window.__dbg.onContact(A,B,h);if(h.vn<3.5||race.state!=='racing')return;   /* toque abaixo de ~13 km/h: nem investiga */const pair=[A,B];if(pair.some(c=>c.lastInq&&race.time-c.lastInq<3))return;
   const f=c=>({x:Math.cos(c.hd),z:Math.sin(c.hd)});const rel=(X,Y)=>{const fx=f(X);return (Y.pos.x-X.pos.x)*fx.x+(Y.pos.z-X.pos.z)*fx.z};
   let culprit=null;const aBehind=rel(A,B)>2.5&&Math.abs(wrapA(A.hd-B.hd))<0.6,bBehind=rel(B,A)>2.5&&Math.abs(wrapA(A.hd-B.hd))<0.6;
   if(aBehind)culprit=A;else if(bBehind)culprit=B;   /* velocidades já são pós-impacto: quem estava atrás e fechou (vn>2,2) é o culpado */
   else{const lat=c=>{const i=c.sIdx;const n=T.n[i];return(Math.cos(c.va)*n.x+Math.sin(c.va)*n.z)*c.v};const side=Math.sign((B.pos.x-A.pos.x)*T.n[A.sIdx].x+(B.pos.z-A.pos.z)*T.n[A.sIdx].z);
     const toward=(c,s)=>lat(c)*s;const ta=toward(A,side),tb=toward(B,-side);if(Math.max(ta,tb)>1.2)culprit=ta>tb?A:B}
   if(!culprit)return;const victim=culprit===A?B:A;A.lastInq=B.lastInq=race.time;
-  INQ.push({culprit,victim,t:race.time,sev:h.vn,off0:victim.offTrack,dmg0:victim.dmg});
-  if(culprit.isPlayer||victim.isPlayer)race.toast('INVESTIGAÇÃO',`Toque entre ${culprit.d.c} e ${victim.d.c}`)}
+  const ord=race.order();INQ.push({culprit,victim,t:race.time,sev:h.vn,off0:victim.offTrack,dmg0:victim.dmg,wing0:victim.wing||0,vp0:ord.indexOf(victim),cAhead0:ord.indexOf(culprit)<ord.indexOf(victim)});
+  if((culprit.isPlayer||victim.isPlayer)&&h.vn>5)race.toast('INVESTIGAÇÃO',`Toque entre ${culprit.d.c} e ${victim.d.c}`)}
 /* decisão (diretrizes FIA 2025): causar colisão = 10 s (base); 5 s com atenuante (1ª volta ou impacto baixo);
    sem consequência esportiva = advertência. Responsabilidade dividida = incidente de corrida (sem ação). */
 function checkInvestigations(){for(let k=INQ.length-1;k>=0;k--){const q=INQ[k];const v=q.victim;if(Math.abs(v.yawRate||0)>1.6||Math.abs(wrapA(v.hd-v.va))>0.45)q.spun=true;if(race.time-q.t<2.5)continue;INQ.splice(k,1);
-  const harmed=q.spun||v.offTrack>q.off0+0.4||v.dmg>q.dmg0+0.03||q.sev>8;const mitig=(race.time<25&&q.culprit.lap<=1)||q.sev<5;const pen=mitig?5:10;
+  /* consequência esportiva (diretriz FIA 2025): rodou, saiu da pista, perdeu posição para o culpado ou ficou com dano de verdade */
+  const ord=race.order();const lostPos=q.vp0!=null&&!q.cAhead0&&ord.indexOf(q.culprit)<ord.indexOf(v);
+  const harmed=q.spun||v.offTrack>q.off0+1.0||lostPos||(v.wing||0)>(q.wing0||0)+0.15||v.dmg>q.dmg0+0.08||q.sev>11;const mitig=(race.time<25&&q.culprit.lap<=1)||q.sev<5;const pen=mitig?5:10;
   const who=q.kind==='forcing'?'Empurrou '+v.d.c+' para fora da pista':'Causou colisão com '+v.d.c;
   if(harmed){q.culprit.penalty+=pen;q.culprit.pp=(q.culprit.pp||0)+(pen>=10?3:2);if(q.culprit.isPlayer)race.toast('PENALIDADE +'+pen+' s',who);else if(v.isPlayer)race.toast(q.culprit.d.c+' PUNIDO','+'+pen+' s · '+(q.kind==='forcing'?'empurrou você para fora':'causou colisão'))}
-  else{q.culprit.reprimands=(q.culprit.reprimands||0)+1;if(q.culprit.isPlayer||v.isPlayer)race.toast('ADVERTÊNCIA',q.culprit.d.c+' · toque sem consequência')}}}
+  else if(q.sev>7){q.culprit.reprimands=(q.culprit.reprimands||0)+1;if(q.culprit.isPlayer||v.isPlayer)race.toast('ADVERTÊNCIA',q.culprit.d.c+' · toque forte sem consequência')}
+  else if(q.culprit.isPlayer||v.isPlayer)race.toast('SEM AÇÃO','Incidente de corrida')}}
 /* empurrar para fora sem toque: vítima sai da pista com o rival colado ao lado vindo na direção dela */
 function checkForcing(){for(const v of race.cars){if(v.inPit)continue;const off=Math.abs(v.latNow||0)>HW+CAR_HW+0.15;const was=v.wasOffF;v.wasOffF=off;if(!off||was||race.time<5)continue;
   for(const o of race.cars){if(o===v||o.inPit)continue;if(!(v.isPlayer||o.isPlayer))continue;let dd=(o.sIdx-v.sIdx);if(dd<-N/2)dd+=N;if(dd>N/2)dd-=N;dd*=T.ds;if(Math.abs(dd)>6)continue;
@@ -754,6 +757,7 @@ function checkAdvantage(c){const off=Math.abs(c.latNow||0)>HW+CAR_HW+0.15;const 
 function trackLimits(c){const out=Math.abs(c.latNow||0)>HW+CAR_HW+0.15&&c.v>8;if(out&&!c.tlOut)c.tlPending=race.time;c.tlOut=out;
   /* espera 0,6 s: se foi empurrado para fora (forcedUntil), não conta */
   if(c.tlPending!=null&&race.time-c.tlPending>0.6){const forced=c.forcedUntil>c.tlPending-0.3;const t0=c.tlPending;c.tlPending=null;if(forced)return;
+    if(VPROF&&c.v<0.86*VPROF[c.sIdx])return;   /* saiu e perdeu tempo (areia, erro de freada): sem vantagem, sem infração */
     c.tlCount=(c.tlCount||0)+1;c.lapOK=false;void t0;
     if(c.tlCount<3)race.toast('LIMITE DE PISTA','Aviso '+c.tlCount+' · volta anulada');else if(c.tlCount===3)race.toast('BANDEIRA PRETA E BRANCA','Próxima infração: +5 s');else{c.penalty+=5;race.toast('PENALIDADE +5 s','Limites de pista')}}}
 
@@ -859,7 +863,7 @@ class Car{
     yawDes+=this.spin*this.throttle*Math.sign(st||1)*1.6*(1-Math.abs(slipA)*2);   // oversteer com roda patinando
     yawDes*=clamp(1-(Math.abs(slipA)-0.07)*5,0.4,1);                                            // pneus saturados: subesterço
     if(bump)yawDes+=Math.sin(race.time*40)*0.06*clamp(this.v/40,0,1);
-    this.hd+=yawDes*dt;if(this.yawRate){this.hd+=this.yawRate*dt;this.yawRate*=Math.exp(-dt*(this.v>5?2.2:4))}
+    this.hd+=yawDes*dt;if(this.yawRate){this.hd+=this.yawRate*dt;this.yawRate*=Math.exp(-dt*(this.v>5?5:6))}
     const dvaMax=(Fmax/m)/Math.max(this.v,3);
     const need=wrapA(this.hd-this.va);
     const turn=clamp(need*14,-dvaMax,dvaMax);
@@ -1059,6 +1063,7 @@ function readInput(dt){const c=race.player;if(!c)return;
   if(race.state!=='racing'){br=1;th=0;if(race.state==='lights'&&(keys.KeyW||keys.ArrowUp||touch.gas))th=0.001}
   if(race.opt.brakeAssist&&race.state==='racing'&&!c.inPit&&VPROF){const v=c.v,i=c.sIdx;let vt=1e9;const hz=Math.round(Math.max(40,v*3.2)/T.ds);const kA=0.75*MU0*c.comp.mu,aA=kA*G,aB=(kA*0.5*RHO*CLA+0.5*RHO*1.05)/c.mass;   /* a = A + B·v², como na IA */
     for(let j=0;j<=hz;j+=2){const ii=(i+j)%N;if(VCORN[ii]>=97.9)continue;const vp=VCORN[ii]*0.90;const vb=Math.sqrt((vp*vp+aA/aB)*Math.exp(2*aB*j*T.ds)-aA/aB);if(vb<vt)vt=vb}
+    const ah=race.carAheadLane(c,45);if(ah&&ah.dist<40&&ah.car.brake>0.2){const g=6.5+v*0.18;vt=Math.min(vt,Math.max(0,ah.v-(ah.car.brake>0.3?3:0)+(ah.dist-g)*0.9))}   /* não enfia na traseira de quem freia antes (vácuo chega mais rápido) */
     if(v>vt){br=Math.max(br,clamp((v-vt)*0.6,0,1));th=Math.min(th,0)}c.assistBrake=v>vt}
   c.throttle=lerp(c.throttle,th,dt*12);c.brake=lerp(c.brake,br,dt*14);
   if((keys.Space||touch.drs)&&c.inDRSZone&&c.drsOK&&!c.inPit)c.drsOpen=true;

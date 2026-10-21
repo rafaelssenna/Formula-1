@@ -38,7 +38,7 @@ Regras:
 - Guinada limitada pelo grip dianteiro: volante todo em alta dá subesterço, não pião.
 - Gravidade na rampa entra na força longitudinal (subida freia, descida empurra).
 - Mureta: impulso na normal (restituição 0,25), atrito na tangente, dano pela velocidade normal. Nunca teleportar o carro.
-- Carro x carro: caixas orientadas 5,5 × 2,0 m, impulso no ponto de contato (restituição 0,15, atrito 0,35), giro pelo braço de alavanca (`yawRate`, amortecido pelos pneus). Asa dianteira quebra acima de ~14 km/h de impacto frontal e tira até 35% do downforce.
+- Carro x carro: caixas orientadas 5,5 × 2,0 m, impulso no ponto de contato (restituição 0,05, atrito 0,2), giro pelo braço de alavanca com inércia ×1,6 e no máximo 3 rad/s (`yawRate`, amortecido pelos pneus a 5/s): toque leve só balança, carro de 800 kg não quica. Dano só acima de ~14 km/h; asa dianteira quebra acima de ~18 km/h de impacto frontal e tira até 35% do downforce.
 - O carro se apoia nos **dois eixos**: altura = média das alturas da pista sob cada eixo; arfagem = inclinação entre eles.
 
 ### IA em tráfego
@@ -47,11 +47,12 @@ Regras:
 
 ### Comissários (FIA) — base: diretrizes de penalidades F1 2025 (FIA, 14/05/2025)
 - Só pune quem for **total ou predominantemente culpado**; responsabilidade dividida = incidente de corrida, sem ação.
-- Investigação quando o toque passa de 2,2 m/s. Culpado: quem estava atrás numa batida traseira, ou quem se moveu lateralmente para cima do outro.
-- **Causar colisão:** 10 s (base); 5 s com atenuante (1ª volta nos primeiros 25 s, ou impacto < 5 m/s). **Sem consequência esportiva** (vítima não rodou, não saiu, sem dano, impacto ≤ 8 m/s): advertência.
+- Investigação quando o toque passa de 3,5 m/s (~13 km/h); aviso na tela só acima de 5 m/s. Culpado: quem estava atrás numa batida traseira, ou quem se moveu lateralmente para cima do outro.
+- **Causar colisão:** 10 s (base); 5 s com atenuante (1ª volta nos primeiros 25 s, ou impacto < 5 m/s). **Consequência esportiva** = vítima rodou, ficou > 1 s fora da pista, perdeu posição para o culpado, asa +15% ou dano +8%, ou impacto > 11 m/s. Sem consequência: impacto > 7 m/s = advertência; abaixo disso, "sem ação · incidente de corrida".
 - **Empurrar para fora sem toque:** vítima sai da pista com o rival colado vindo na direção dela = 10 s / 5 s. A vítima não toma limite de pista.
 - **Sair da pista e ganhar posição (jogador):** 10 s para devolver; senão +10 s.
-- **Limites de pista:** volta anulada; 3ª = bandeira preta e branca; 4ª em diante = +5 s cada. Não conta se foi empurrado/batido para fora (espera 0,6 s).
+- **Limites de pista:** volta anulada; 3ª = bandeira preta e branca; 4ª em diante = +5 s cada. Não conta se foi empurrado/batido para fora (espera 0,6 s) nem se voltou abaixo de 86% do perfil (saiu e perdeu tempo = sem vantagem, como no F1 25).
+- Assistência de freio também segura distância do carro da frente quando ele freia (vácuo chega mais rápido).
 - IA defende com **um** movimento só (mais de um = 5 s na regra real).
 
 ### Disputa
