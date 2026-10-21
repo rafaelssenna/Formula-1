@@ -359,17 +359,29 @@ const rlMesh=ribbon(i=>RL[i]-0.16,i=>RL[i]+0.16,()=>new THREE.Color(0.2,0.95,0.4
 // escape: brita no lado de fora das curvas, grama no resto
 for(const s of[-1,1]){
   ribbon(i=>s*(HW+2.3),i=>s*(HW+(isRunoff(i)&&outsideOf(i)===s?12.5:2.31)),()=>WHITE,-0.01,{mat:gravelPBR,vLen:4,uRep:3});
-  ribbon(i=>s*(HW+(isRunoff(i)&&outsideOf(i)===s?12.5:2.3)),i=>s*(HW+15.2),i=>MOW[Math.floor(i*T.ds/9)%2],-0.02,{mat:grassPBR,vLen:5,uRep:4});}
+  ribbon(i=>s*(HW+(isRunoff(i)&&outsideOf(i)===s?12.5:2.3)),i=>s*(HW+15.2),i=>{const c=MOW[Math.floor(i*T.ds/9)%2].clone();const v=0.93+0.07*Math.sin(i*0.37)*Math.sin(i*0.113+1.7);return c.multiplyScalar(v).lerp(new THREE.Color(.86,.83,.62),0.08+0.08*Math.max(0,Math.sin(i*0.051)))},-0.02,{mat:grassPBR,vLen:5,uRep:4});}
 // barreiras: TecPro/pneus nas curvas, concreto nas retas; alambrado acima
-(function barriers(){for(const side of[-1,1]){const pos=[],col=[],idx=[],uv=[];const off=side*(HW+14.6);
-  for(let i=0;i<=N;i++){const j=i%N,p=T.p[j],n=T.n[j];const c=isRunoff(j)?((Math.floor(j*T.ds/4)%2)?RED:BLUE):new THREE.Color(.78,.8,.82);
-    pos.push(p.x+n.x*off,p.y-0.2,p.z+n.z*off,p.x+n.x*off,p.y+1.15,p.z+n.z*off);col.push(c.r,c.g,c.b,c.r,c.g,c.b);uv.push(0,0,0,0);
-    if(i<N){const k=i*2;idx.push(k,k+1,k+2,k+1,k+3,k+2,k,k+2,k+1,k+1,k+2,k+3)}}
-  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));g.setAttribute('color',new THREE.Float32BufferAttribute(col,3));g.setIndex(idx);g.computeVertexNormals();
-  scene.add(new THREE.Mesh(g,new THREE.MeshStandardMaterial({vertexColors:true,roughness:.85,side:THREE.DoubleSide})));
-  const fp=[],fu=[],fi=[];for(let i=0;i<=N;i++){const j=i%N,p=T.p[j],n=T.n[j];fp.push(p.x+n.x*off,p.y+1.15,p.z+n.z*off,p.x+n.x*off,p.y+4.2,p.z+n.z*off);const vv=i*T.ds/3;fu.push(vv,0,vv,1);if(i<N){const k=i*2;fi.push(k,k+1,k+2,k+1,k+3,k+2)}}
-  const fg=new THREE.BufferGeometry();fg.setAttribute('position',new THREE.Float32BufferAttribute(fp,3));fg.setAttribute('uv',new THREE.Float32BufferAttribute(fu,2));fg.setIndex(fi);
-  scene.add(new THREE.Mesh(fg,new THREE.MeshBasicMaterial({map:fenceTex,transparent:true,side:THREE.DoubleSide,depthWrite:false})))}})();
+/* muretas reais: concreto pintado nas retas, barreira TecPro (blocos vermelho/branco) nas áreas de escape; alambrado com postes */
+const wallTex=canvasTex(256,64,(x,w,h)=>{const g=x.createLinearGradient(0,0,0,h);g.addColorStop(0,'#f1f2f2');g.addColorStop(.12,'#e4e6e7');g.addColorStop(.8,'#c9ccce');g.addColorStop(1,'#8d8f90');x.fillStyle=g;x.fillRect(0,0,w,h);
+  for(let k=0;k<1400;k++){x.fillStyle=`rgba(${Math.random()<.5?0:255},${Math.random()<.5?0:255},${Math.random()<.5?0:255},.025)`;x.fillRect(Math.random()*w,Math.random()*h,2,2)}
+  x.fillStyle='rgba(60,60,60,.55)';x.fillRect(0,0,2,h);x.fillStyle='rgba(0,0,0,.12)';x.fillRect(0,h*0.55,w,2);x.fillStyle='rgba(40,30,20,.18)';for(let k=0;k<30;k++)x.fillRect(Math.random()*w,h*0.8+Math.random()*h*0.2,3+Math.random()*12,2)});
+const tecTex=canvasTex(256,64,(x,w,h)=>{for(let b=0;b<2;b++){const x0=b*w/2;x.fillStyle=b?'#f2f2f2':'#c8102e';x.fillRect(x0,0,w/2,h);const g=x.createLinearGradient(x0,0,x0+w/2,0);g.addColorStop(0,'rgba(0,0,0,.28)');g.addColorStop(.12,'rgba(0,0,0,0)');g.addColorStop(.88,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(0,0,0,.28)');x.fillStyle=g;x.fillRect(x0,0,w/2,h);
+    x.fillStyle='rgba(0,0,0,.18)';x.fillRect(x0,h*.48,w/2,3);x.fillStyle='rgba(255,255,255,.18)';x.fillRect(x0,2,w/2,3)}x.fillStyle='#1b1b1b';x.fillRect(0,0,3,h);x.fillRect(w/2-1,0,3,h)});
+(function barriers(){const wallM=new THREE.MeshStandardMaterial({map:wallTex,roughness:.9,side:THREE.DoubleSide}),tecM=new THREE.MeshStandardMaterial({map:tecTex,roughness:.7,side:THREE.DoubleSide});
+  const posts=[];
+  for(const side of[-1,1]){const off=side*(HW+14.6);
+    /* duas faixas: concreto (some nas áreas de escape) e TecPro (só nelas) — altura zero onde não se aplica */
+    for(const kind of['wall','tec']){const pos=[],uv=[],idx=[];for(let i=0;i<=N;i++){const j=i%N,p=T.p[j],n=T.n[j];const run=isRunoff(j);const on=kind==='tec'?run:!run;const top=on?(kind==='tec'?1.05:1.15):-0.2;
+        pos.push(p.x+n.x*off,p.y-0.2,p.z+n.z*off,p.x+n.x*off,p.y+top,p.z+n.z*off);const u=i*T.ds/(kind==='tec'?2.0:4.0);uv.push(u,0,u,1);if(i<N){const k=i*2;idx.push(k,k+1,k+2,k+1,k+3,k+2)}}
+      const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));g.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));g.setIndex(idx);g.computeVertexNormals();
+      const m=new THREE.Mesh(g,kind==='tec'?tecM:wallM);m.receiveShadow=true;scene.add(m)}
+    const fp=[],fu=[],fi=[];for(let i=0;i<=N;i++){const j=i%N,p=T.p[j],n=T.n[j];fp.push(p.x+n.x*off,p.y+1.15,p.z+n.z*off,p.x+n.x*off,p.y+4.2,p.z+n.z*off);const vv=i*T.ds/3;fu.push(vv,0,vv,1);if(i<N){const k=i*2;fi.push(k,k+1,k+2,k+1,k+3,k+2)}}
+    const fg=new THREE.BufferGeometry();fg.setAttribute('position',new THREE.Float32BufferAttribute(fp,3));fg.setAttribute('uv',new THREE.Float32BufferAttribute(fu,2));fg.setIndex(fi);
+    scene.add(new THREE.Mesh(fg,new THREE.MeshBasicMaterial({map:fenceTex,transparent:true,side:THREE.DoubleSide,depthWrite:false})));
+    const step=MOBILE?9:4.5;for(let s=0;s<T.L;s+=step){const i=idxAt(s),p=T.p[i],n=T.n[i];posts.push([p.x+n.x*(off+side*0.15),p.y+2.7,p.z+n.z*(off+side*0.15)])}}
+  /* postes do alambrado (instanciados) */
+  const pg=new THREE.CylinderGeometry(.045,.045,3.1,5);const pm=new THREE.MeshStandardMaterial({color:srgb('#5d6166'),roughness:.5,metalness:.6});const pim=new THREE.InstancedMesh(pg,pm,posts.length);const o=new THREE.Object3D();
+  posts.forEach((q,k)=>{o.position.set(q[0],q[1],q[2]);o.updateMatrix();pim.setMatrixAt(k,o.matrix)});scene.add(pim)})();
 // terreno acompanhando a elevação da pista (sem penhascos) + colinas distantes
 (function ground(){const SZ=2600,SEG=MOBILE?170:325;const g=new THREE.PlaneGeometry(SZ,SZ,SEG,SEG);g.rotateX(-Math.PI/2);const pos=g.attributes.position;
   const coarse=[];for(let i=0;i<N;i+=8)coarse.push(T.p[i]);let mean=0;for(const q of T.y)mean+=q;mean/=N;
@@ -578,7 +590,7 @@ async function loadCarGLTF(url){
   return gltf}
 const MODELS={ready:false,prog:0,errs:[],ok:0,total:0};const IS_MOBILE=MOBILE;
 function loadModels(){const loader=new THREE.GLTFLoader();const keys=[...new Set(Object.values(CAR_MODEL))];const lods=IS_MOBILE?['lo','vlo']:['hi','lo','vlo'];let done=0;const jobs=[];
-  for(const k of keys)for(const lod of lods)jobs.push((async()=>{const url=`assets/cars/${k}_${lod}.json`;let g=null;try{g=await loadCarGLTF(url)}catch(e1){try{g=await new Promise((rs,rj)=>loader.load(url,rs,undefined,rj))}catch(e2){MODELS.errs.push(k+'_'+lod+': '+(e1&&e1.message||e1)+' / '+(e2&&e2.message||e2));console.warn('modelo',k,lod,e1,e2)}}if(g){(MODELS[k]=MODELS[k]||{})[lod]=bakeCarModel(g.scene);MODELS.ok++}done++;MODELS.prog=done/jobs.length})());
+  for(const k of keys)for(const lod of lods)jobs.push((async()=>{const url=`assets/cars/${k}_${lod}.json`;let g=null;try{g=await loadCarGLTF(url)}catch(e1){try{g=await new Promise((rs,rj)=>loader.load(url,rs,undefined,rj))}catch(e2){MODELS.errs.push(k+'_'+lod+': '+(e1&&e1.message||e1)+' / '+(e2&&e2.message||e2));console.warn('modelo',k,lod,e1,e2)}}if(g){(MODELS[k]=MODELS[k]||{})[lod]=bakeCarModel(g.scene,lod==='vlo');   /* longe: rodas fixas junto da carroceria (1 malha) */MODELS.ok++}done++;MODELS.prog=done/jobs.length})());
   MODELS.total=jobs.length;return Promise.all(jobs).then(()=>{MODELS.ready=keys.every(k=>MODELS[k]&&(MODELS[k].hi||MODELS[k].lo))})}
 const TINT_CACHE={};
 /* disco de borrão de movimento (estilo F1 25): pneu preto, faixa do composto borrada, calota 2022+ com anéis concêntricos */
@@ -596,18 +608,22 @@ function carMeshGLTF(d){const M=MODELS[CAR_MODEL[d.t]];if(!MODELS.ready||!M)retu
     s.updateMatrixWorld(true);const wheels=['wheel_FL','wheel_FR','wheel_RL','wheel_RR'].map(n=>{const node=s.getObjectByName(n);if(!node)return null;const c=new THREE.Box3().setFromObject(node).getCenter(new THREE.Vector3());s.worldToLocal(c);const wc=node.userData.wheelCenter;if(wc){c.y=wc[0];c.z=wc[1]}   // centro do anel do pneu gravado em prepare-car.mjs
       const pivot=new THREE.Group();pivot.position.copy(c);s.add(pivot);const spin=new THREE.Group();pivot.add(spin);spin.attach(node);pivot.userData.spin=spin;return pivot});
     // eixo traseiro do modelo (z=-WB/2) vai para x=-1.85 do carro; modelo +z = frente -> +x
-    wheels.forEach(pv=>{if(!pv)return;const sx=Math.sign(pv.position.x)||1;s.updateMatrixWorld(true);const bb=new THREE.Box3().setFromObject(pv.userData.spin);const outer=sx>0?bb.max.x:bb.min.x;const disc=new THREE.Mesh(BLUR_GEO,null);disc.position.x=outer-pv.position.x+sx*0.004;disc.rotation.y=sx*Math.PI/2;disc.scale.setScalar(0.345);disc.renderOrder=2;pv.add(disc);pv.userData.disc=disc});
+    /* discos de borrão e brilhos de freio: as 4 rodas viram 1 malha cada (menos chamadas de desenho; o esterço de poucos graus não aparece no borrão) */
+    {const dl=[],gl=[];wheels.forEach(pv=>{if(!pv)return;const sx=Math.sign(pv.position.x)||1;s.updateMatrixWorld(true);const bb=new THREE.Box3().setFromObject(pv.userData.spin);if(bb.isEmpty())return;const outer=sx>0?bb.max.x:bb.min.x;const dx=outer-pv.position.x+sx*0.004;pv.updateMatrix();
+      const q=new THREE.Quaternion().setFromEuler(new THREE.Euler(0,sx*Math.PI/2,0));dl.push({geo:BLUR_GEO,matrix:new THREE.Matrix4().multiplyMatrices(pv.matrix,new THREE.Matrix4().compose(new THREE.Vector3(dx,0,0),q,new THREE.Vector3(.345,.345,.345)))});
+      gl.push({geo:BLUR_GEO,matrix:new THREE.Matrix4().multiplyMatrices(pv.matrix,new THREE.Matrix4().compose(new THREE.Vector3(dx*0.35,0,0),q,new THREE.Vector3(.17,.17,.17)))})});
+      if(dl.length){const dm=new THREE.Mesh(mergeGeos(dl,true,false),null);dm.renderOrder=2;dm.visible=false;s.add(dm);s.userData.disc=dm;const gm=new THREE.Mesh(mergeGeos(gl,true,false),null);gm.visible=false;s.add(gm);s.userData.glow=gm}}
     const wb=wheels[0]&&wheels[2]?wheels[0].position.z-wheels[2].position.z:3.5;s.rotation.y=Math.PI/2;s.position.x=-1.85+wb/2;return{s,wheels}};
   /* níveis de detalhe: perto -> longe (o mais leve tem ~15 mil triângulos) */
   const built=LV.map(([k])=>build(M[k]));const g=new THREE.Group();const hi=built[0];
   if(built.length>1){const lod=new THREE.LOD();built.forEach((b,i)=>lod.addLevel(b.s,LV[i][1]));g.add(lod)}else g.add(hi.s);
   const blurMat=new THREE.MeshBasicMaterial({map:blurTex(d.comp||'M'),transparent:true,opacity:0,depthWrite:false,side:THREE.DoubleSide});
-  const wheels=hi.wheels.map((w,i)=>{if(!w)return new THREE.Group();if(w.userData.disc)w.userData.disc.material=blurMat;w.userData.twins=built.slice(1).map(b=>b.wheels[i]).filter(Boolean);w.userData.twins.forEach(t=>{if(t.userData.disc)t.userData.disc.material=blurMat});return w});
+  built.forEach(b=>{if(b.s.userData.disc)b.s.userData.disc.material=blurMat});const wheels=hi.wheels.map((w,i)=>{if(!w)return new THREE.Group();w.userData.twins=built.slice(1).map(b=>b.wheels[i]).filter(Boolean);return w});
   wheels.blurMat=blurMat;
   const glowMat=new THREE.MeshBasicMaterial({color:0xff6a10,transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide,toneMapped:false});
-  wheels.forEach(pv=>{if(!pv.userData.disc)return;const gl=new THREE.Mesh(BLUR_GEO,glowMat);gl.scale.setScalar(0.17);gl.position.x=pv.userData.disc.position.x*0.35;gl.rotation.y=pv.userData.disc.rotation.y;pv.add(gl)});
+  built.forEach(b=>{if(b.s.userData.glow)b.s.userData.glow.material=glowMat});
   const rl=new THREE.Mesh(new THREE.BoxGeometry(0.05,0.1,0.18),new THREE.MeshBasicMaterial({color:0x3a0606,toneMapped:false}));rl.position.set(-2.62,0.6,0);g.add(rl);
-  return{g,drs:null,wheels,mat:null,blurMat,glowMat,rearLight:rl}}
+  return{g,drs:null,wheels,mat:null,blurMat,glowMat,rearLight:rl,discs:built.map(b=>b.s.userData.disc).filter(Boolean),glows:built.map(b=>b.s.userData.glow).filter(Boolean)}}
 loadModels();
 
 /* ======================= DESEMPENHO =======================
@@ -642,9 +658,9 @@ function mergeStatic(){scene.updateMatrixWorld(true);const groups=new Map();cons
   if(MOBILE)scene.traverse(o=>{if(o.isMesh&&!o.userData.noMerge)o.castShadow=false});
   console.log('cenário: '+before+' malhas -> '+after);return{before,after}}
 /* carro: carroceria vira 1 malha por material; cada roda vira 1 malha (no referencial do nó da roda) */
-function bakeCarModel(root){root.updateMatrixWorld(true);const inv=new THREE.Matrix4();const wheelNodes=['wheel_FL','wheel_FR','wheel_RL','wheel_RR'].map(n=>root.getObjectByName(n)).filter(Boolean);
+function bakeCarModel(root,staticWheels){root.updateMatrixWorld(true);const inv=new THREE.Matrix4();const wheelNodes=['wheel_FL','wheel_FR','wheel_RL','wheel_RR'].map(n=>root.getObjectByName(n)).filter(Boolean);
   const inWheel=o=>{for(let p=o;p;p=p.parent)if(wheelNodes.includes(p))return p;return null};const body=new Map();const wheels=new Map();
-  root.traverse(o=>{if(!o.isMesh)return;const w=inWheel(o);if(w){(wheels.get(w)||wheels.set(w,[]).get(w)).push(o)}else{const k=o.material.uuid;(body.get(k)||body.set(k,{m:o.material,list:[]}).get(k)).list.push(o)}});
+  root.traverse(o=>{if(!o.isMesh)return;const w=staticWheels?null:inWheel(o);if(w){(wheels.get(w)||wheels.set(w,[]).get(w)).push(o)}else{const k=o.material.uuid;(body.get(k)||body.set(k,{m:o.material,list:[]}).get(k)).list.push(o)}});
   const out=new THREE.Group();out.name=root.name;
   for(const{m,list}of body.values()){const geo=mergeGeos(list.map(o=>({geo:o.geometry,matrix:o.matrixWorld})),true,false);const me=new THREE.Mesh(geo,m);me.name='body';out.add(me)}
   for(const w of wheelNodes){const g=new THREE.Group();g.name=w.name;g.userData=Object.assign({},w.userData);const wp=new THREE.Vector3(),wq=new THREE.Quaternion(),ws=new THREE.Vector3();w.matrixWorld.decompose(wp,wq,ws);g.position.copy(wp);g.quaternion.copy(wq);g.scale.copy(ws);
@@ -744,7 +760,7 @@ class Car{
     this.setTyres(compound);this.lap=0;this.sIdx=0;this.s=0;this.prevS=0;this.lapStart=0;this.cur=[0,0,0];this.secT=[null,null,null];this.bestSec=[null,null,null];this.best=null;this.last=null;this.sector=0;
     this.cp=new Array(96).fill(null);this.finished=false;this.finishT=null;this.inPit=false;this.pitReq=false;this.pitU=0;this.pitStop=0;this.pitDone=false;this.stops=0;this.compUsed=new Set([compound]);
     this.slip=0;this.lock=0;this.spin=0;this.surf=1;this.ai=null;this.penalty=0;this.dmg=0;this.offTrack=0;this.lapOK=true;
-    const m=carMeshGLTF(this.d)||carMesh(this.d);this.mesh=m.g;this.drsMesh=m.drs;this.wheels=m.wheels;this.blurMat=m.blurMat||null;this.glowMat=m.glowMat||null;this.rearLight=m.rearLight||null;if(this.blurMat)this.blurMat.map=blurTex(this.compKey);const bs=new THREE.Mesh(BLOB_GEO,BLOB_MAT);bs.position.set(0,0.03,0);bs.renderOrder=1;this.mesh.add(bs);scene.add(this.mesh)}
+    const m=carMeshGLTF(this.d)||carMesh(this.d);this.mesh=m.g;this.drsMesh=m.drs;this.wheels=m.wheels;this.blurMat=m.blurMat||null;this.glowMat=m.glowMat||null;this.rearLight=m.rearLight||null;this.discs=m.discs||[];this.glows=m.glows||[];if(this.blurMat)this.blurMat.map=blurTex(this.compKey);const bs=new THREE.Mesh(BLOB_GEO,BLOB_MAT);bs.position.set(0,0.03,0);bs.renderOrder=1;this.mesh.add(bs);scene.add(this.mesh)}
   setTyres(c){this.comp=COMPOUNDS[c];this.compKey=c;this.wear=0;this.temp=[85,85,85,85];this.compUsed&&this.compUsed.add(c);if(this.wheels)setTyreColor(this)}
   get mass(){return 798+this.fuel}
   place(s,lat){const i=idxAt(s);this.sIdx=i;this.s=s;this.prevS=s;const p=T.p[i],n=T.n[i];this.pos.set(p.x+n.x*lat,p.y,p.z+n.z*lat);this.hd=Math.atan2(T.t[i].z,T.t[i].x);this.va=this.hd;this.v=0}
@@ -863,8 +879,8 @@ class Car{
       for(let s=0;s<n||(s===0&&Math.random()<n);s++){_sp.set(-0.9+Math.random()*2.2,0.04,(Math.random()-.5)*0.5);m.localToWorld(_sp);const ch=Math.cos(this.va),sh=Math.sin(this.va);
         _sv.set(ch*this.v*(0.35+Math.random()*0.3)+(Math.random()-.5)*3,0.6+Math.random()*2.2,sh*this.v*(0.35+Math.random()*0.3)+(Math.random()-.5)*3);sparks.spawn(_sp,_sv)}}
     this.brakeHeat=clamp((this.brakeHeat||0)+(this.brake*this.v*0.025-((this.brakeHeat||0)*0.7))*dt,0,1);
-    if(this.glowMat)this.glowMat.opacity=clamp((this.brakeHeat-0.18)*2.2,0,0.95);
-    if(this.rearLight){const harvest=this.brake>0.25&&this.v>12;this.rearLight.material.color.setHex(harvest&&(Math.floor(performance.now()/120)%2)?0xff2020:0x3a0606)}const ch=Math.cos(this.hd),sh=Math.sin(this.hd);
+    if(this.glowMat){this.glowMat.opacity=clamp((this.brakeHeat-0.18)*2.2,0,0.95);const gv=this.glowMat.opacity>0.01;for(const gm of this.glows)gm.visible=gv}
+    if(this.rearLight){const lit=this.brake>0.25&&this.v>12&&(Math.floor(performance.now()/120)%2);this.rearLight.material.color.setHex(0xff2020);this.rearLight.visible=!!lit}const ch=Math.cos(this.hd),sh=Math.sin(this.hd);
     // altura do chão nos dois eixos (pos = eixo traseiro, dianteiro 3,6 m à frente) -> carro apoiado na pista
     const fax=this.pos.x+ch*3.6,faz=this.pos.z+sh*3.6;const iR=this.sIdx;this.iF=nearest(new THREE.Vector3(fax,0,faz),(iR+Math.round(3.6/T.ds))%N);/* âncora no índice físico: nunca 'pula' para outro trecho */const yR=heightAt(this.pos.x,this.pos.z,iR),yF=heightAt(fax,faz,this.iF);
     const offT=Math.abs(this.latNow||0)>HW+2.3?-0.02:0;
@@ -872,7 +888,7 @@ class Car{
     const pitch=clamp(Math.atan2(yF-yR,3.6),-0.2,0.2)+clamp(-(this.accLong||0)*0.0016,-0.02,0.02);   // nariz sobe na subida; mergulha na frenagem
     const roll=clamp((this.accLat||0)*0.0022,-0.035,0.035);
     m.rotation.order='YZX';m.rotation.set(roll,-this.hd,pitch);
-    const dAng=Math.min(this.v/WR*dt,0.45);if(this.blurMat)this.blurMat.opacity=clamp((this.v*3.6-45)/75,0,0.93);const sa=-this.steer*0.42/(1+this.v/22);
+    const dAng=Math.min(this.v/WR*dt,0.45);if(this.blurMat){this.blurMat.opacity=clamp((this.v*3.6-45)/75,0,0.93);const dv=this.blurMat.opacity>0.01;for(const dm of this.discs)dm.visible=dv}const sa=-this.steer*0.42/(1+this.v/22);
     for(let w=0;w<4;w++){const wh=this.wheels[w];const k=(w<2&&this.lock>.5?0.1:1);if(wh.userData.spin){wh.userData.spin.rotation.x-=dAng*k;if(w<2)wh.rotation.y=sa;const tws=wh.userData.twins;if(tws)for(const tw of tws){tw.userData.spin.rotation.x=wh.userData.spin.rotation.x;tw.rotation.y=wh.rotation.y}}else if(wh.children.length>1){wh.children[0].rotation.z-=dAng*k;wh.children[1].rotation.z=wh.children[0].rotation.z;if(w<2)wh.rotation.y=sa}}
     if(this.drsMesh){this.drsMesh.rotation.z=this.drsOpen?-0.95:-0.3;this.drsMesh.position.y=this.drsOpen?0.98:1.05}
     if(this.v>6&&(this.spin>0.25||this.lock>0.4||this.surf<0.7)){for(let w=0;w<4;w++){if(w<2&&this.lock<0.4&&this.surf>=0.7)continue;if(w>=2&&this.spin<0.25&&this.surf>=0.7)continue;const wp=this.wheels[w].getWorldPosition(new THREE.Vector3());fx.spawn(wp,new THREE.Vector3((Math.random()-.5)*2-Math.cos(this.hd)*this.v*0.12,0.9,(Math.random()-.5)*2-Math.sin(this.hd)*this.v*0.12),this.surf<0.7?2.4:1.5)}}}
