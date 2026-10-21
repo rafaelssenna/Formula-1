@@ -1,5 +1,5 @@
 <meta charset="utf-8">
-<title>Interlagos Racer</title>
+<title>Grande Prêmio de São Paulo 2025</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Titillium+Web:wght@400;600;700;900&family=Barlow+Condensed:wght@500;700&display=swap">
@@ -136,9 +136,9 @@ tr.me td{background:rgba(255,255,255,.08)}
 
 <div id="menu">
   <div class="wrap">
-    <div class="eyebrow">Corrida em Interlagos · Autódromo José Carlos Pace</div>
-    <h1>Interlagos <span>Racer</span></h1>
-    <p class="lead">Interlagos, 4.309 km, 15 curvas, sentido anti-horário. Grid com 20 carros, pneus macio/médio/duro, DRS, ERS, desgaste, combustível e pit stop. Escolha o piloto e largue.</p>
+    <div class="eyebrow">Fórmula 1 · Temporada 2025 · Autódromo José Carlos Pace</div>
+    <h1>Grande Prêmio <span>de São Paulo</span></h1>
+    <p class="lead">Interlagos, 4.309 km, 15 curvas, sentido anti-horário. Grid completo de 2025, pneus Pirelli C3/C4/C5, DRS, ERS, desgaste, combustível e pit stop. Escolha o piloto e largue.</p>
     <div class="eyebrow">Piloto</div>
     <div class="grid" id="drivers"></div>
     <div class="opts">
@@ -156,7 +156,7 @@ tr.me td{background:rgba(255,255,255,.08)}
         <label class="chk"><input type="checkbox" id="aAuto"> Acelerador automático</label>
       </div>
     </div>
-    <button class="start" id="go">Largar</button><div class="eyebrow" id="mstat" style="margin-top:10px"></div><div class="eyebrow" id="credits" style="margin-top:6px">Jogo de fã, sem relação com a Fórmula 1, a FIA, as equipes ou patrocinadores. Modelos 3D dos carros: Redgrund (Sketchfab, CC BY) · HDRI e texturas: Poly Haven (CC0)</div>
+    <button class="start" id="go">Largar</button><div class="eyebrow" id="mstat" style="margin-top:10px"></div><div class="eyebrow" id="credits" style="margin-top:6px">Jogo de fã, sem relação oficial com a Fórmula 1, a FIA ou as equipes. Modelos 3D: Redgrund (Sketchfab, CC BY) · HDRI e texturas: Poly Haven (CC0)</div>
     <div class="keys">
       <div><b>W / ↑</b> acelerar</div><div><b>S / ↓</b> frear</div><div><b>A D / ← →</b> esterçar</div>
       <div><b>Shift · Ctrl</b> marcha ↑ ↓</div><div><b>Espaço</b> abrir DRS</div><div><b>E</b> deploy ERS (overtake)</div>
@@ -217,20 +217,20 @@ const fmtD=t=>(t>=0?'+':'-')+Math.abs(t).toFixed(3);
 
 /* ======================= DADOS 2025 ======================= */
 const TEAMS={
-  MCL:{n:'Laranja Motorsport',c:'#FF8000',pace:1.000},FER:{n:'Scuderia Rossa',c:'#E8002D',pace:.992},RBR:{n:'Azul Noturno',c:'#3671C6',pace:.994},
-  MER:{n:'Prata Racing',c:'#27F4D2',pace:.991},WIL:{n:'Celeste GP',c:'#64C4FF',pace:.983},RB:{n:'Junior Azul',c:'#6692FF',pace:.981},
-  AST:{n:'Verde Britânico',c:'#229971',pace:.980},HAA:{n:'Branco F1',c:'#B6BABD',pace:.980},ALP:{n:'Alpes Racing',c:'#0093CC',pace:.977},SAU:{n:'Neon Team',c:'#52E252',pace:.978}};
+  MCL:{n:'McLaren',c:'#FF8000',pace:1.000},FER:{n:'Ferrari',c:'#E8002D',pace:.992},RBR:{n:'Red Bull',c:'#3671C6',pace:.994},
+  MER:{n:'Mercedes',c:'#27F4D2',pace:.991},WIL:{n:'Williams',c:'#64C4FF',pace:.983},RB:{n:'Racing Bulls',c:'#6692FF',pace:.981},
+  AST:{n:'Aston Martin',c:'#229971',pace:.980},HAA:{n:'Haas',c:'#B6BABD',pace:.980},ALP:{n:'Alpine',c:'#0093CC',pace:.977},SAU:{n:'Kick Sauber',c:'#52E252',pace:.978}};
 const DRIVERS=[
-  {n:'Leo Navarro',c:'NAV',num:4,t:'MCL',sk:.998},{n:'Otto Pires',c:'PIR',num:81,t:'MCL',sk:.999},
-  {n:'Caio Leme',c:'LEM',num:16,t:'FER',sk:.997},{n:'Luiz Hamada',c:'HMD',num:44,t:'FER',sk:.992},
-  {n:'Mateus Veras',c:'VRS',num:1,t:'RBR',sk:1.0},{n:'Yan Tsuji',c:'TSJ',num:22,t:'RBR',sk:.982},
-  {n:'Gustavo Rossi',c:'ROS',num:63,t:'MER',sk:.995},{n:'Kauã Antunes',c:'ANU',num:12,t:'MER',sk:.986},
-  {n:'André Alba',c:'ALA',num:23,t:'WIL',sk:.988},{n:'Cássio Saes',c:'SAE',num:55,t:'WIL',sk:.991},
-  {n:'Igor Haddad',c:'HDD',num:6,t:'RB',sk:.985},{n:'Lucas Lago',c:'LAG',num:30,t:'RB',sk:.981},
-  {n:'Felipe Aloísio',c:'FAL',num:14,t:'AST',sk:.993},{n:'Lauro Strauss',c:'STS',num:18,t:'AST',sk:.976},
-  {n:'Elias Ochoa',c:'OCH',num:31,t:'HAA',sk:.984},{n:'Otávio Beltrão',c:'BEL',num:87,t:'HAA',sk:.982},
-  {n:'Pedro Gaspar',c:'GSP',num:10,t:'ALP',sk:.986},{n:'Fábio Colombo',c:'CLB',num:43,t:'ALP',sk:.977},
-  {n:'Nícolas Hulk',c:'HLK',num:27,t:'SAU',sk:.985},{n:'Gabriel Borges',c:'BRG',num:5,t:'SAU',sk:.983}];
+  {n:'Lando Norris',c:'NOR',num:4,t:'MCL',sk:.998},{n:'Oscar Piastri',c:'PIA',num:81,t:'MCL',sk:.999},
+  {n:'Charles Leclerc',c:'LEC',num:16,t:'FER',sk:.997},{n:'Lewis Hamilton',c:'HAM',num:44,t:'FER',sk:.992},
+  {n:'Max Verstappen',c:'VER',num:1,t:'RBR',sk:1.0},{n:'Yuki Tsunoda',c:'TSU',num:22,t:'RBR',sk:.982},
+  {n:'George Russell',c:'RUS',num:63,t:'MER',sk:.995},{n:'Kimi Antonelli',c:'ANT',num:12,t:'MER',sk:.986},
+  {n:'Alex Albon',c:'ALB',num:23,t:'WIL',sk:.988},{n:'Carlos Sainz',c:'SAI',num:55,t:'WIL',sk:.991},
+  {n:'Isack Hadjar',c:'HAD',num:6,t:'RB',sk:.985},{n:'Liam Lawson',c:'LAW',num:30,t:'RB',sk:.981},
+  {n:'Fernando Alonso',c:'ALO',num:14,t:'AST',sk:.993},{n:'Lance Stroll',c:'STR',num:18,t:'AST',sk:.976},
+  {n:'Esteban Ocon',c:'OCO',num:31,t:'HAA',sk:.984},{n:'Oliver Bearman',c:'BEA',num:87,t:'HAA',sk:.982},
+  {n:'Pierre Gasly',c:'GAS',num:10,t:'ALP',sk:.986},{n:'Franco Colapinto',c:'COL',num:43,t:'ALP',sk:.977},
+  {n:'Nico Hülkenberg',c:'HUL',num:27,t:'SAU',sk:.985},{n:'Gabriel Bortoleto',c:'BOR',num:5,t:'SAU',sk:.983}];
 const COMPOUNDS={S:{n:'S',full:'Soft C5',mu:1.045,wear:1.0/14,col:'#ff2a2a',opt:100},M:{n:'M',full:'Medium C4',mu:1.0,wear:1.0/24,col:'#ffd400',opt:98},H:{n:'H',full:'Hard C3',mu:.965,wear:1.0/38,col:'#f2f2f2',opt:96}};
 
 /* ======================= PISTA (Interlagos) ======================= */
@@ -418,7 +418,7 @@ grandstand(0.80*T.L,220,HW+24,4,true);              // Junção / Subida dos Box
   race_lights=[];for(let k=0;k<5;k++){const l=new THREE.Mesh(new THREE.SphereGeometry(.26,10,8),new THREE.MeshStandardMaterial({color:0x2a0000,emissive:0x000000}));l.position.set(-0.25,8.2,-1.6+k*0.8);g.add(l);race_lights.push(l)}
   scene.add(g);
   // ponte de patrocínio
-  const f=frameAt(T.L-250,0);const b=new THREE.Mesh(new THREE.BoxGeometry(1.2,2.6,2*HW+10),new THREE.MeshBasicMaterial({map:textTex('INTERLAGOS · SÃO PAULO','#0b1a33','#fff',2048,160)}));b.position.set(f.x,f.y+8.4,f.z);b.rotation.y=f.ry;scene.add(b);
+  const f=frameAt(T.L-250,0);const b=new THREE.Mesh(new THREE.BoxGeometry(1.2,2.6,2*HW+10),new THREE.MeshBasicMaterial({map:textTex('GRANDE PRÊMIO DE SÃO PAULO 2025','#0b1a33','#fff',2048,160)}));b.position.set(f.x,f.y+8.4,f.z);b.rotation.y=f.ry;scene.add(b);
   for(const s of[-1,1]){const p=new THREE.Mesh(new THREE.BoxGeometry(.6,8,.6),pm);const n=T.n[f.i];p.position.set(f.x+n.x*s*(HW+4.5),f.y+4,f.z+n.z*s*(HW+4.5));scene.add(p)}})();
 (function scenery(){
   // placas de frenagem e DRS
@@ -428,7 +428,7 @@ grandstand(0.80*T.L,220,HW+24,4,true);              // Junção / Subida dos Box
   for(const z of DRS_ZONES){const f=frameAt(z.from%T.L,HW+3.4);const b=new THREE.Mesh(new THREE.BoxGeometry(.1,1.6,1.3),new THREE.MeshBasicMaterial({map:textTex('DRS','#111','#3ddc84',256,160)}));b.position.set(f.x,f.y+1.4,f.z);b.rotation.y=f.ry;scene.add(b);
     const fd=frameAt(z.det,-(HW+3.4));const bd=new THREE.Mesh(new THREE.BoxGeometry(.1,1.0,1.6),new THREE.MeshBasicMaterial({map:textTex('DETECÇÃO','#111','#fff',256,96)}));bd.position.set(fd.x,fd.y+1.2,fd.z);bd.rotation.y=fd.ry;scene.add(bd)}
   // placas de patrocínio sobre os muros nas retas
-  const ads=['SÃO PAULO','INTERLAGOS','VELOX','APEX TYRES','TERRA OIL','NOVA BANK','PISTA FM','ZENITH','ORBITA','CAFÉ VILA','RIO AIR','MARÉ'];const adCol=['#e10600','#0b1a33','#00a19c','#111','#ffd400','#1b5e20','#d40511','#232f3e','#0b6b2c','#0a2540','#5c0632','#0d2a4a'];
+  const ads=['SÃO PAULO','INTERLAGOS','GP BRASIL 2025','F1','PIRELLI','ROLEX','DHL','AWS','HEINEKEN','CRYPTO.COM','QATAR AIRWAYS','MSC'];const adCol=['#e10600','#0b1a33','#00a19c','#111','#ffd400','#1b5e20','#d40511','#232f3e','#0b6b2c','#0a2540','#5c0632','#0d2a4a'];
   for(let s=0,k=0;s<T.L;s+=70,k++){const i=idxAt(s);if(isRunoff(i))continue;for(const side of[-1,1]){const f=frameAt(s,side*(HW+14.6));const m=new THREE.Mesh(new THREE.BoxGeometry(60,1.0,.12),new THREE.MeshBasicMaterial({map:textTex(ads[(k+side+12)%12],adCol[(k+side+12)%12],'#fff',2048,96)}));m.position.set(f.x,f.y+1.7,f.z);m.rotation.y=f.ry;scene.add(m)}}
   // pilhas de pneus nas curvas (instanciadas)
   (function tyres(){const geo=new THREE.CylinderGeometry(.36,.36,.95,12);const m=new THREE.MeshStandardMaterial({color:0xffffff,roughness:.92});const list=[];const RUB=new THREE.Color(0x141414),WH=new THREE.Color(0xe8e8e8),RD=new THREE.Color(0xc41212);
@@ -517,7 +517,7 @@ function carMesh(d){const geo=carGeos();const [c1,c2,c3]=LIVERY[d.t];const p1=pa
 function setTyreColor(car){const c=car.comp.col;for(const w of car.wheels)if(w.userData.stripe)w.userData.stripe.material.color.set(c);if(car.blurMat){car.blurMat.map=blurTex(car.compKey);car.blurMat.needsUpdate=true}}
 /* ---- modelos glTF reais (Sketchfab, autor Redgrund, CC BY; convertidos: 2 LODs, rodas separadas) ---- */
 const CAR_MODEL={MCL:'mcl',FER:'fer',RBR:'rbr',MER:'ast',AST:'ast',WIL:'mcl',RB:'mcl',ALP:'mcl',HAA:'ast',SAU:'ast'};
-const CAR_TINT={MCL:'blur(3px)',FER:'blur(3px)',RBR:'blur(3px)',MER:'saturate(.12) brightness(.8) blur(3px)',WIL:'hue-rotate(200deg) saturate(1.2) brightness(.9) blur(3px)',RB:'hue-rotate(205deg) saturate(.9) brightness(1.5) blur(3px)',AST:'blur(3px)',HAA:'saturate(0) brightness(1.7) blur(3px)',ALP:'hue-rotate(215deg) saturate(1.3) blur(3px)',SAU:'hue-rotate(-12deg) saturate(1.3) brightness(.9) blur(3px)'};   /* edição pública: blur deixa logos de patrocinadores ilegíveis */
+const CAR_TINT={WIL:'hue-rotate(200deg) saturate(1.2) brightness(.9)',RB:'hue-rotate(205deg) saturate(.9) brightness(1.5)',ALP:'hue-rotate(215deg) saturate(1.3)',HAA:'saturate(0) brightness(1.7)',MER:'saturate(.12) brightness(.8)',SAU:'hue-rotate(-12deg) saturate(1.3) brightness(.9)'};
 /* Carrega o modelo .json (glTF com dados embutidos) SEM pedir endereços data:/blob: à rede:
    decodifica o binário e as imagens aqui mesmo, monta um GLB em memória e reaplica as texturas.
    Páginas com segurança restrita (como artifacts) bloqueiam fetch de data:, o que derrubava os carros 3D. */
@@ -936,7 +936,7 @@ function hud(dt){const c=race.player;if(!c)return;hudT+=dt;
   $('sec').querySelectorAll('i').forEach((e,i)=>{e.className=c.sector>i||(c.lap>=2&&i===2&&c.sector===0)?race.secCls[i]:''});
   $('last').textContent=fmt(c.last);$('best').textContent=fmt(c.best);
   const dEl=$('delta');if(c.best&&c.sector>0){const ref=c.sector===1?c.bestSec[0]:c.bestSec[0]+c.bestSec[1];const now=c.sector===1?c.cur[0]:c.cur[0]+c.cur[1];const d=now-ref;dEl.textContent=fmtD(d);dEl.className='d '+(d<0?'neg':'pos')}else{dEl.textContent='--';dEl.className='d'}
-  if(hudT>0.25){hudT=0;const o=race.order();let h='<div class="hd">INTERLAGOS · V'+Math.min(Math.max(race.player.lap,1),race.laps)+'</div>';
+  if(hudT>0.25){hudT=0;const o=race.order();let h='<div class="hd">GP SÃO PAULO · V'+Math.min(Math.max(race.player.lap,1),race.laps)+'</div>';
     const pi=o.indexOf(race.player);
     o.forEach((x,i)=>{let g='';const far=!(i<3||Math.abs(i-pi)<=1);if(i===0)g=x.finished?'VENC':'Líder';else{const a=o[i-1];if(x.finished&&a.finished)g='+'+(x.finishT-a.finishT).toFixed(1);else{const gp=race.gapTo(x,a);g=gp>=99?'+1 V':'+'+gp.toFixed(1)}}
       h+=`<div class="r${x.isPlayer?' me':''}${x.inPit?' pit':''}${far?' far':''}"><span class="p">${i+1}</span><span class="c" style="background:${x.team.c}"></span><span>${x.d.c}</span><span class="g${x.drsOpen?' drs':''}">${x.inPit?'PIT':g}</span></div>`});
@@ -978,14 +978,14 @@ let lastCW=0,lastCH=0;
 function resize(){const w=Math.max(1,canvas.clientWidth||innerWidth),h=Math.max(1,canvas.clientHeight||innerHeight);lastCW=w;lastCH=h;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();if(composer){const pr=renderer.getPixelRatio();composer.setPixelRatio(pr);composer.setSize(w,h);smaaPass.setSize(w*pr,h*pr)}}addEventListener('resize',resize);addEventListener('orientationchange',()=>setTimeout(resize,250));resize();
 requestAnimationFrame(frame);window.__dbg.step=step;window.__dbg.DT=DT;window.__dbg.tick=tick;window.__dbg.audio=audio;
 /* ======================= MENU / RESULTADOS ======================= */
-let selDriver='VRS';
+let selDriver='VER';
 (function waitModels(){const b=$('go');const st=$('mstat');if(MODELS.ready||MODELS.prog>=1){b.disabled=false;b.textContent='Largar';st.textContent=MODELS.errs.length?('Carros 3D: '+MODELS.ok+'/'+MODELS.total+' carregados · erro: '+MODELS.errs[0].slice(0,140)):('Carros 3D: '+MODELS.ok+'/'+MODELS.total+' carregados');st.style.color=MODELS.errs.length?'#ff6b6b':'';return}b.disabled=true;b.textContent='Carregando carros… '+Math.round(MODELS.prog*100)+'%';setTimeout(waitModels,200)})();
 (function menu(){const g=$('drivers');DRIVERS.forEach(d=>{const b=document.createElement('button');b.className='drv'+(d.c===selDriver?' sel':'');b.style.setProperty('--tc',TEAMS[d.t].c);b.innerHTML=`<div class="num">${d.num}</div><div class="nm">${d.n}</div><div class="tm">${TEAMS[d.t].n}</div>`;b.onclick=()=>{selDriver=d.c;g.querySelectorAll('.drv').forEach(x=>x.classList.toggle('sel',x===b))};g.appendChild(b)});
   for(const id of['laps','diff','tyre','camsel'])$(id).addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;$(id).querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b))});
   $('go').onclick=()=>{const v=id=>$(id).querySelector('.on').dataset.v;race.opt={driver:selDriver,laps:+v('laps'),diff:+v('diff'),tyre:v('tyre'),tc:$('aTC').checked,abs:$('aABS').checked,autoGear:$('aGear').checked,line:$('aLine').checked,steerAssist:$('aSteer').checked,autoGas:$('aAuto').checked,brakeAssist:$('aBrake').checked};
     race.laps=race.opt.laps;rlMesh.visible=race.opt.line;cam.mode=+v('camsel');canvas.setAttribute('tabindex','0');canvas.focus();$('menu').classList.add('hidden');$('res').classList.add('hidden');$('hud').classList.remove('hidden');race.paused=false;race.endT=null;race.goT=0;
     if(!VPROF){buildProfile();colorRacingLine()}setup();audio.start();checkRotate();renderer.compile(scene,camera);if(composer)composer.render();/* pré-compila shaders */lastT=performance.now();acc=0}})();
-function showResults(){const o=race.order();const r=$('res');let h='<div class="wrap"><div class="eyebrow">Classificação final · Interlagos · '+race.laps+' voltas</div><h1>Resultado</h1><table><tr><th>Pos</th><th></th><th>Piloto</th><th>Equipe</th><th>Gap</th><th>Melhor volta</th><th>Paradas</th></tr>';
+function showResults(){const o=race.order();const r=$('res');let h='<div class="wrap"><div class="eyebrow">Classificação final · GP de São Paulo 2025 · '+race.laps+' voltas</div><h1>Resultado</h1><table><tr><th>Pos</th><th></th><th>Piloto</th><th>Equipe</th><th>Gap</th><th>Melhor volta</th><th>Paradas</th></tr>';
   const w=o[0];o.forEach((c,i)=>{const gap=i===0?'Vencedor':c.finished?'+'+(c.finishT-w.finishT).toFixed(3):'+'+(w.lap-c.lap)+' volta(s)';const fl=race.fastestBy===c?' fl':'';
     h+=`<tr class="${c.isPlayer?'me':''}"><td class="n">${i+1}</td><td><span style="display:inline-block;width:5px;height:18px;background:${c.team.c}"></span></td><td>${c.d.n}${c.penalty?' <small style="color:var(--yellow)">+'+c.penalty+'s</small>':''}</td><td>${c.team.n}</td><td>${gap}</td><td class="${fl}">${fmt(c.best)}</td><td>${c.stops}</td></tr>`});
   h+='</table><p class="foot">Volta mais rápida: '+(race.fastestBy?race.fastestBy.d.n+' · '+fmt(race.fastest):'--')+'. Largada do grid: P'+race.player.gridPos+'.</p><button class="start" id="again">Nova corrida</button></div>';
