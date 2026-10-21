@@ -22,4 +22,5 @@ Jogo de fã, sem fins comerciais e sem relação oficial com a Fórmula 1, a FIA
 - Modelos 3D dos carros: **Redgrund** no Sketchfab, licença [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Modificados (escala, rodas separadas, menos polígonos). A Mercedes e a Haas usam o modelo da Aston Martin repintado.
   - [Aston Martin AMR23](https://sketchfab.com/3d-models/f6ba825a43b146a9b669934a4e1fd529) · [Ferrari SF-23](https://sketchfab.com/3d-models/ecb0f812bc454331bbe721655b0780ec) · [McLaren MCL60](https://sketchfab.com/3d-models/8340e27c325345e4aa92a6a31cc34b1e) · [Red Bull RB19](https://sketchfab.com/3d-models/e4afe46f3aab4b23a418da06fc163821)
 - Céu (HDRI `kloofendal_48d_partly_cloudy_puresky`) e texturas de asfalto, grama e brita: [Poly Haven](https://polyhaven.com), CC0.
+- Traçado de Interlagos: linha central da [TUMFTM racetrack-database](https://github.com/TUMFTM/racetrack-database) (LGPL-3.0).
 - Biblioteca 3D: [three.js](https://threejs.org) r128 (MIT).

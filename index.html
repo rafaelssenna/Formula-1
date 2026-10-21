@@ -55,6 +55,7 @@ h1 span{color:var(--red)}
 .tower .p{font-family:var(--display);font-weight:700;font-size:14px;text-align:center}
 .tower .c{height:14px;border-radius:1px}
 .tower .g{text-align:right;color:var(--mut);font-size:11px}
+.tower .pen{color:var(--yellow);font-style:normal;font-size:10px;margin-left:3px}
 .tower .g.drs{color:var(--green)}
 .timing{position:absolute;top:max(10px,env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);background:var(--panel);border-radius:4px;padding:6px 14px;display:flex;gap:18px;align-items:center;font-size:13px}
 .timing .lap{font-family:var(--display);font-size:22px;font-weight:700}
@@ -144,7 +145,7 @@ tr.me td{background:rgba(255,255,255,.08)}
     <div class="grid" id="drivers"></div>
     <div class="opts">
       <div class="opt"><h3>Voltas</h3><div class="seg" id="laps"><button data-v="3">3</button><button data-v="5" class="on">5</button><button data-v="10">10</button><button data-v="25">25</button><button data-v="71">71 (GP)</button></div></div>
-      <div class="opt"><h3>Dificuldade da IA</h3><div class="seg" id="diff"><button data-v="0.90">Fácil</button><button data-v="0.95" class="on">Médio</button><button data-v="0.985">Difícil</button><button data-v="1.015">Lendário</button></div></div>
+      <div class="opt"><h3>Dificuldade da IA</h3><div class="seg" id="diff"><button data-v="1.0">Fácil</button><button data-v="1.06" class="on">Médio</button><button data-v="1.09">Difícil</button><button data-v="1.115">Lendário</button></div></div>
       <div class="opt"><h3>Câmera (tecla C troca)</h3><div class="seg" id="camsel"><button data-v="1" class="on">T-cam</button><button data-v="2">Cockpit</button><button data-v="4">Bico</button><button data-v="0">Perseguição</button><button data-v="5">Perseguição longe</button><button data-v="3">TV</button></div></div>
       <div class="opt"><h3>Pneu de largada</h3><div class="seg" id="tyre"><button data-v="S">Soft C5</button><button data-v="M" class="on">Medium C4</button><button data-v="H">Hard C3</button></div></div>
       <div class="opt"><h3>Assistências</h3>
@@ -235,17 +236,21 @@ const DRIVERS=[
 const COMPOUNDS={S:{n:'S',full:'Soft C5',mu:1.045,wear:1.0/14,col:'#ff2a2a',opt:100},M:{n:'M',full:'Medium C4',mu:1.0,wear:1.0/24,col:'#ffd400',opt:98},H:{n:'H',full:'Hard C3',mu:.965,wear:1.0/38,col:'#f2f2f2',opt:96}};
 
 /* ======================= PISTA (Interlagos) ======================= */
-const SC=1.5, HW=7;  // escala e meia-largura (14 m)
-const RAW=[[330,-300,38],[200,-300,36],[60,-300,33],[-120,-298,30],[-210,-292,27],[-258,-268,22],[-278,-225,17],[-282,-185,13],[-292,-150,10],[-322,-110,7],[-345,-62,5],[-355,0,4],[-343,62,4],[-308,110,5],[-250,140,6],[-175,152,7],[-60,156,8],[80,160,9],[200,162,10],[282,160,11],[332,140,12],[352,100,13],[342,60,15],[315,36,18],[290,8,22],[277,-30,26],[288,-70,29],[318,-95,31],[357,-100,32],[386,-85,32],[396,-55,31],[395,-20,30],[420,0,29],[450,2,28],[480,-8,27],[495,-35,26],[484,-60,25],[458,-66,24],[432,-55,23],[395,-25,21],[385,15,19],[393,58,17],[412,98,15],[455,112,14],[498,95,15],[518,55,18],[522,-40,23],[512,-130,28],[484,-212,32],[432,-270,35],[365,-297,37]];
-const CORNERS=[[5,'T1 S do Senna'],[8,'T2'],[11,'T3 Curva do Sol'],[20,'T4 Descida do Lago'],[22,'T5'],[25,'T6 Ferradura'],[29,'T7 Laranjinha'],[31,'T8 Pinheirinho'],[34,'T9 Bico de Pato'],[36,'T10'],[38,'T11 Mergulho'],[42,'T12 Junção'],[47,'T13 Subida dos Boxes'],[49,'T14 Arquibancadas']];
+const SC=1, HW=7;  // metros reais; meia-largura 7 m (pista de ~14 m)
+/* Traçado real de Interlagos: linha central da base TUMFTM racetrack-database (SaoPaulo.csv, LGPL-3.0), 1 ponto a cada ~15 m.
+   Coordenadas do jogo: x = x, z = -y. Altimetria aproximada por distância (largada no alto, mínimo na Descida do Lago). */
+const RAW_XY=[[-0.5,0.5],[3.3,15.0],[7.0,29.6],[10.6,44.1],[14.4,58.6],[18.4,73.1],[22.4,87.5],[26.4,101.9],[30.4,116.4],[34.3,130.9],[38.2,145.3],[42.2,159.8],[46.1,174.3],[50.1,188.7],[54.1,203.2],[58.0,217.6],[62.0,232.1],[65.9,246.6],[69.9,261.1],[74.4,275.3],[80.3,289.0],[88.4,301.7],[97.7,313.4],[110.0,321.4],[124.7,324.9],[139.4,324.1],[151.0,315.0],[161.2,303.8],[171.4,292.9],[182.2,282.5],[195.0,275.0],[209.7,272.5],[223.6,277.2],[236.4,285.0],[249.5,292.2],[263.2,298.4],[277.3,303.3],[291.9,306.9],[306.7,309.1],[321.7,309.7],[336.6,308.6],[351.3,305.9],[365.6,301.4],[379.2,295.1],[391.8,287.1],[403.6,277.9],[414.4,267.4],[423.7,255.8],[431.8,243.1],[438.9,229.9],[444.8,216.2],[448.9,201.8],[453.0,187.3],[457.3,173.0],[461.9,158.7],[465.7,144.2],[469.1,129.6],[472.5,115.0],[476.1,100.4],[479.7,85.9],[483.4,71.4],[487.1,56.8],[490.9,42.3],[494.7,27.8],[498.4,13.3],[502.2,-1.2],[505.9,-15.7],[509.7,-30.3],[513.4,-44.8],[517.1,-59.3],[520.8,-73.8],[524.5,-88.4],[528.2,-102.9],[531.9,-117.4],[535.7,-131.9],[539.4,-146.5],[543.1,-161.0],[546.9,-175.5],[550.6,-190.0],[554.4,-204.5],[558.1,-219.1],[561.9,-233.6],[565.7,-248.1],[569.4,-262.6],[573.2,-277.1],[577.0,-291.6],[580.8,-306.1],[584.6,-320.6],[588.3,-335.1],[592.1,-349.6],[595.8,-364.2],[599.5,-378.7],[602.9,-393.3],[603.6,-408.1],[601.2,-423.1],[594.7,-436.4],[583.2,-445.7],[569.4,-451.2],[554.7,-454.5],[539.9,-457.2],[525.2,-459.5],[510.3,-461.7],[495.4,-463.2],[480.4,-463.9],[465.5,-463.4],[450.8,-460.7],[436.8,-455.4],[422.7,-450.4],[408.8,-444.8],[396.3,-436.6],[384.5,-427.3],[374.0,-416.7],[364.9,-404.8],[356.2,-392.6],[347.8,-380.2],[339.4,-367.7],[331.1,-355.3],[322.7,-342.8],[314.4,-330.4],[305.9,-318.0],[297.4,-305.6],[288.8,-293.3],[280.2,-281.1],[271.5,-268.8],[262.8,-256.6],[254.1,-244.5],[245.3,-232.3],[236.5,-220.1],[227.7,-208.0],[218.9,-195.8],[210.1,-183.7],[201.2,-171.6],[192.4,-159.6],[183.1,-147.8],[172.8,-136.9],[161.1,-127.5],[147.5,-122.2],[132.6,-121.0],[117.5,-121.0],[102.6,-122.4],[88.0,-125.6],[74.1,-131.0],[60.9,-138.2],[48.0,-145.9],[36.3,-155.1],[26.8,-166.8],[20.4,-180.2],[15.3,-194.3],[11.5,-208.8],[8.9,-223.5],[6.5,-238.3],[3.8,-253.1],[1.3,-267.9],[-0.4,-282.8],[-0.8,-297.8],[1.8,-312.2],[12.0,-322.8],[25.8,-328.8],[40.5,-328.5],[53.9,-322.2],[66.0,-313.5],[78.5,-305.0],[92.4,-299.3],[107.0,-297.9],[121.2,-302.3],[131.9,-312.6],[138.4,-326.0],[141.1,-340.7],[139.6,-355.6],[134.3,-369.6],[125.7,-381.8],[115.0,-392.3],[104.2,-402.6],[93.4,-413.1],[82.8,-423.7],[72.8,-434.8],[63.4,-446.5],[55.1,-459.0],[48.6,-472.4],[44.3,-486.8],[40.7,-501.4],[37.1,-515.9],[33.8,-530.6],[35.5,-545.1],[46.2,-554.9],[60.2,-560.9],[74.3,-560.2],[84.8,-549.5],[94.6,-538.1],[104.5,-526.9],[114.3,-515.8],[124.2,-504.4],[134.3,-493.2],[145.1,-482.7],[156.9,-473.6],[169.8,-466.4],[184.0,-461.2],[198.7,-458.0],[213.6,-456.7],[228.5,-457.2],[243.3,-459.4],[257.8,-463.4],[270.9,-470.4],[282.3,-480.2],[292.0,-491.6],[300.6,-503.8],[308.6,-516.5],[316.5,-529.3],[324.3,-542.1],[332.1,-554.9],[339.8,-567.7],[347.6,-580.5],[355.4,-593.4],[363.0,-606.2],[370.7,-619.1],[378.2,-632.1],[384.9,-645.5],[388.4,-659.9],[386.1,-674.7],[376.8,-685.9],[363.7,-693.0],[349.6,-698.3],[335.4,-703.2],[321.4,-708.3],[307.3,-713.5],[293.1,-718.5],[278.6,-721.8],[263.7,-722.1],[248.8,-720.0],[234.1,-717.1],[219.4,-714.3],[204.6,-711.8],[189.8,-709.3],[175.2,-705.8],[161.1,-701.0],[147.1,-695.5],[133.3,-689.7],[119.7,-683.5],[106.2,-676.8],[93.0,-669.7],[80.1,-662.1],[67.6,-653.9],[55.5,-645.1],[43.9,-635.5],[33.1,-625.2],[23.3,-613.8],[15.4,-601.1],[8.4,-587.9],[2.1,-574.2],[-2.8,-560.1],[-6.6,-545.6],[-10.1,-531.0],[-13.6,-516.5],[-17.2,-501.9],[-20.5,-487.3],[-23.8,-472.7],[-27.0,-458.0],[-30.1,-443.3],[-33.3,-428.7],[-36.4,-414.0],[-39.6,-399.4],[-42.9,-384.7],[-46.3,-370.1],[-49.8,-355.6],[-53.2,-341.0],[-56.2,-326.3],[-58.7,-311.6],[-60.6,-296.7],[-61.7,-281.7],[-62.1,-266.7],[-61.6,-251.7],[-60.3,-236.8],[-58.1,-222.0],[-55.2,-207.3],[-51.8,-192.7],[-48.2,-178.1],[-44.5,-163.6],[-40.8,-149.1],[-37.1,-134.5],[-33.4,-120.0],[-29.5,-105.5],[-25.6,-91.1],[-21.7,-76.6],[-17.7,-62.2],[-13.7,-47.7],[-9.7,-33.3],[-5.7,-18.8],[-1.8,-4.3]];
+const ELEV=[[0,38],[200,37],[400,34],[550,26],[700,20],[900,14],[1200,8],[1400,5],[1550,4],[1800,7],[2000,10],[2200,15],[2400,17],[2600,16],[2800,13],[3000,9],[3200,8],[3400,9],[3600,10],[3800,16],[4000,24],[4200,33],[4310,38]];
+const elevAt=s=>{for(let k=1;k<ELEV.length;k++)if(s<=ELEV[k][0]){const[a,ya]=ELEV[k-1],[b,yb]=ELEV[k];const t=(s-a)/(b-a);return ya+(yb-ya)*(t*t*(3-2*t))}return ELEV[ELEV.length-1][1]};
+const RAW=(()=>{let s=0;return RAW_XY.map((p,i)=>{if(i)s+=Math.hypot(p[0]-RAW_XY[i-1][0],p[1]-RAW_XY[i-1][1]);return[p[0],p[1],elevAt(s)]})})();
 const curve=new THREE.CatmullRomCurve3(RAW.map(p=>new THREE.Vector3(p[0]*SC,p[2],p[1]*SC)),true,'centripetal');
 curve.arcLengthDivisions=6000;
 const N=2400, T={p:[],t:[],n:[],k:[],y:[],ds:0,L:0};
 (function build(){
   T.L=curve.getLength(); T.ds=T.L/N;
-  // s=0 na linha de chegada (ponto RAW[1])
+  // s=0 na linha de chegada (ponto RAW[0])
   const u0=curve.getUtoTmapping(0,curve.getLength()*0)||0;
-  let best=0,bd=1e9;const target=new THREE.Vector3(RAW[1][0]*SC,RAW[1][2],RAW[1][1]*SC);
+  let best=0,bd=1e9;const target=new THREE.Vector3(RAW[0][0]*SC,RAW[0][2],RAW[0][1]*SC);
   for(let i=0;i<N;i++){const p=curve.getPointAt(i/N);const d=p.distanceTo(target);if(d<bd){bd=d;best=i}}
   for(let i=0;i<N;i++){const u=((i+best)%N)/N;const p=curve.getPointAt(u);const t=curve.getTangentAt(u);t.y=0;t.normalize();
     T.p.push(p);T.t.push(t);T.n.push(new THREE.Vector3(-t.z,0,t.x));T.y.push(p.y)}
@@ -257,11 +262,16 @@ const Ksm=sm(T.k,12), Kwide=sm(T.k,40), Ksharp=sm(T.k,4);
 const kMax=Math.max(...Kwide.map(Math.abs));
 const RL=Kwide.map(k=>clamp(k/kMax*HW*0.62,-HW*.62,HW*.62)); // offset lateral da linha de corrida (+ = para n)
 const idxAt=s=>((Math.round(s/T.ds)%N)+N)%N;
+/* curvatura da trajetória que o carro realmente segue (linha de corrida RL), medida em ±8 amostras (~15 m): é o que o carro consegue cumprir */
+const KLINE=(()=>{const P=T.p.map((p,i)=>({x:p.x+T.n[i].x*RL[i],z:p.z+T.n[i].z*RL[i]}));const w=8,k=new Array(N);for(let i=0;i<N;i++){const a=P[(i-w+N)%N],b=P[i],c=P[(i+w)%N];let d=Math.atan2(c.z-b.z,c.x-b.x)-Math.atan2(b.z-a.z,b.x-a.x);while(d>Math.PI)d-=2*Math.PI;while(d<-Math.PI)d+=2*Math.PI;k[i]=d/((Math.hypot(b.x-a.x,b.z-a.z)+Math.hypot(c.x-b.x,c.z-b.z))/2)}return k})();
+const CORNER_NAMES=['T1 S do Senna','T2 S do Senna','T3 Curva do Sol','T4 Descida do Lago','T5','T6 Ferradura','T7 Ferradura','T8 Laranjinha','T9 Pinheirinho','T10 Bico de Pato','T11 Mergulho','T12 Junção','T13','T14 Subida dos Boxes','T15 Arquibancadas'];
+const CORNERS=(()=>{const W=Math.round(70/T.ds),pk=[];for(let i=0;i<N;i++){const a=Math.abs(Ksm[i]);if(a<0.011)continue;let mx=true;for(let j=-W;j<=W;j++)if(Math.abs(Ksm[(i+j+N)%N])>a){mx=false;break}if(mx&&(!pk.length||(i-pk[pk.length-1])*T.ds>90))pk.push(i)}
+  return pk.map((i,k)=>[i*T.ds,CORNER_NAMES[k]||('Curva '+(k+1))])})();
 const S1=0.26*T.L,S2=0.70*T.L;
-const DRS_ZONES=[{det:0.235*T.L,from:0.30*T.L,to:0.40*T.L},{det:0.905*T.L,from:0.96*T.L,to:T.L+0.12*T.L}];
-const PIT={entry:0.945*T.L,exit:0.085*T.L};
-// pit lane: paralela à reta dos boxes, 20 m para dentro (lado +n? verificar sinal: infield está em z maior => n aponta para +z na reta que vai para -x)
-const pitPts=[[470,-230],[430,-262],[380,-278],[300,-288],[0,-288],[-120,-288],[-170,-287],[-205,-292]].map(p=>new THREE.Vector3(p[0]*SC,0,p[1]*SC));
+const DRS_ZONES=[{det:430,from:720,to:1300},{det:3560,from:3990,to:T.L+230}];   /* Reta Oposta e reta dos boxes */
+const PIT={entry:T.L-420,exit:300};
+/* pit lane: acompanha a reta dos boxes pelo lado dos boxes (-n), afastando 3 -> 15 m na entrada e voltando na saída */
+const pitPts=(()=>{const out=[];const s0=PIT.entry,s1=T.L+PIT.exit;for(let s=s0;s<=s1;s+=20){const r=Math.min(1,(s-s0)/140,(s1-s)/160);const lat=-(HW+3+12*(r*r*(3-2*r)));const i=idxAt(s);const p=T.p[i],n=T.n[i];out.push(new THREE.Vector3(p.x+n.x*lat,0,p.z+n.z*lat))}return out})();
 const pitCurve=new THREE.CatmullRomCurve3(pitPts,false,'catmullrom',.5); pitCurve.arcLengthDivisions=800;
 const pitLen=pitCurve.getLength(); const pitBoxU=i=>0.50-i*0.028;
 const yAtXZ=(x,z,i)=>{ // altura do terreno pela amostra mais próxima
@@ -324,6 +334,11 @@ const fenceTex=canvasTex(64,64,(x,w,h)=>{x.clearRect(0,0,w,h);x.strokeStyle='rgb
 const TEXT_CACHE={};const textTex=(txt,bg,fg,w,h,font)=>TEXT_CACHE[[txt,bg,fg,w,h,font].join('|')]||(TEXT_CACHE[[txt,bg,fg,w,h,font].join('|')]=canvasTex(w||1024,h||128,(x,W,H)=>{x.fillStyle=bg;x.fillRect(0,0,W,H);x.fillStyle=fg;x.font=font||'900 '+(H*0.62)+'px "Titillium Web",Arial';x.textAlign='center';x.textBaseline='middle';x.fillText(txt,W/2,H/2+H*0.04)}));
 
 /* faixas ao longo da pista */
+/* distância de (x,z) ao traçado inteiro: grade espacial de 40 m sobre todos os pontos da pista */
+const TGRID=(()=>{const g=new Map(),C=40;for(let i=0;i<N;i++){const p=T.p[i];const k=Math.floor(p.x/C)+','+Math.floor(p.z/C);(g.get(k)||g.set(k,[]).get(k)).push(i)}return{g,C}})();
+function nearPits(x,z){for(let s=T.L-480;s<=T.L+60;s+=25){const f=frameAt(((s%T.L)+T.L)%T.L,-(HW+30));if(Math.hypot(f.x-x,f.z-z)<48)return true}return false}
+function trackDist(x,z,maxR){const C=TGRID.C,R=Math.ceil((maxR||200)/C);const cx=Math.floor(x/C),cz=Math.floor(z/C);let best=1e9;
+  for(let a=-R;a<=R;a++)for(let b=-R;b<=R;b++){const l=TGRID.g.get((cx+a)+','+(cz+b));if(!l)continue;for(const i of l){const p=T.p[i];const d=(p.x-x)*(p.x-x)+(p.z-z)*(p.z-z);if(d<best)best=d}}return Math.sqrt(best)}
 function ribbon(offA,offB,colorFn,yOff,opts){opts=opts||{};const pos=[],col=[],uv=[],idx=[];
   for(let i=0;i<=N;i++){const j=i%N,p=T.p[j],n=T.n[j];const a=offA(j),b=offB(j);const ya=yOff+(opts.yA?opts.yA(j):0),yb=yOff+(opts.yB?opts.yB(j):0);
     pos.push(p.x+n.x*a,p.y+ya,p.z+n.z*a, p.x+n.x*b,p.y+yb,p.z+n.z*b);const c=colorFn?colorFn(j):WHITE;col.push(c.r,c.g,c.b,c.r,c.g,c.b);
@@ -388,7 +403,7 @@ function city(mean){const facade=canvasTex(128,256,(x,w,h)=>{x.fillStyle='#d8d2c
   const m=new THREE.MeshStandardMaterial({map:facade,roughness:.85,metalness:0});const roofM=new THREE.MeshStandardMaterial({color:srgb('#8d8a85'),roughness:1});
   const list=[];const tints=['#ffffff','#e9e4da','#cfd5dc','#f2ead8','#bfc3c7','#e6d6c0','#a9b4bf'];
   let tries=0;while(list.length<(MOBILE?450:900)&&tries<20000){tries++;const i=(Math.random()*N)|0;const side=Math.random()<.5?-1:1;const off=side*(HW+180+Math.pow(Math.random(),0.7)*1100);const p=T.p[i],n=T.n[i];const x=p.x+n.x*off,z=p.z+n.z*off;
-    const j=nearest(new THREE.Vector3(x,0,z),i);if(Math.hypot(x-T.p[j].x,z-T.p[j].z)<HW+160)continue;if(window.INFIELD&&INFIELD(x,z))continue;   /* área interna do autódromo: sem prédios */
+    if(trackDist(x,z,200)<HW+160)continue;if(window.INFIELD&&INFIELD(x,z))continue;   /* área interna do autódromo: sem prédios */
     const far=Math.hypot(x-126,z+103);const hgt=far>900?20+Math.random()*95:10+Math.random()*45;const w=14+Math.random()*26,d=14+Math.random()*26;list.push([x,z,w,hgt,d,Math.random()*Math.PI,tints[(Math.random()*tints.length)|0]])}
   const im=new THREE.InstancedMesh(geo,m,list.length);const o=new THREE.Object3D();
   list.forEach((b,k)=>{o.position.set(b[0],mean-6,b[1]);o.rotation.set(0,b[5],0);o.scale.set(b[2],b[3],b[4]);o.updateMatrix();im.setMatrixAt(k,o.matrix);im.setColorAt(k,srgb(b[6]))});
@@ -401,13 +416,13 @@ const frameAt=(s,lat)=>{const i=idxAt(s);const p=T.p[i],n=T.n[i],t=T.t[i];return
 /* arquibancada longa = segmentos de 40 m que seguem a curva e a subida da pista */
 let CROWD_MAT=null;
 function grandstand(s,len,lat,tiers,roof){if(len>48){const n=Math.ceil(len/40),L=len/n;let first=null;for(let k=0;k<n;k++){const g=grandstand1(s-len/2+L*(k+0.5),L+0.6,lat,tiers,roof);first=first||g}return first}return grandstand1(s,len,lat,tiers,roof)}
-function grandstand1(s,len,lat,tiers,roof){const f=frameAt(s,lat);const g=new THREE.Group();g.position.set(f.x,f.y,f.z);g.rotation.y=f.ry;const side=Math.sign(lat);
+function grandstand1(s,len,lat,tiers,roof){const f=frameAt(s,lat);{const side=Math.sign(lat);const far=frameAt(s,lat+side*(tiers*3.2+6));if(trackDist(f.x,f.z,120)<Math.abs(lat)-3||trackDist(far.x,far.z,120)<Math.abs(lat)-3)return null}   /* não encosta em outro trecho */const g=new THREE.Group();g.position.set(f.x,f.y,f.z);g.rotation.y=f.ry;const side=Math.sign(lat);
   for(let t=0;t<tiers;t++){const sg=new THREE.BoxGeometry(len,1.3,3.2);const suv=sg.attributes.uv;for(let i=0;i<suv.count;i++)suv.setX(i,suv.getX(i)*len/40);const seat=new THREE.Mesh(sg,CROWD_MAT||(CROWD_MAT=new THREE.MeshStandardMaterial({map:crowdTex,roughness:1})));seat.position.set(0,1.0+t*1.6,side*(t*3.2));seat.receiveShadow=true;g.add(seat);
     const step=new THREE.Mesh(new THREE.BoxGeometry(len,0.4+t*1.6,3.2),mat(0x9a9ea6));step.position.set(0,(0.4+t*1.6)/2-0.2,side*(t*3.2));g.add(step)}
   if(roof){const r=new THREE.Mesh(new THREE.BoxGeometry(len+4,0.4,tiers*3.2+6),mat(0xe9ecef,.5));r.position.set(0,1.6*tiers+5.5,side*(tiers*3.2/2));r.castShadow=true;g.add(r);
     for(let x=-len/2;x<=len/2;x+=len/6){const c=new THREE.Mesh(new THREE.CylinderGeometry(.25,.25,1.6*tiers+5.5,8),mat(0xd0d4da));c.position.set(x,(1.6*tiers+5.5)/2,side*(tiers*3.2+2));g.add(c)}}
   scene.add(g);return g}
-grandstand(T.L-330,520,-(HW+21),6,true);          // reta dos boxes (lado externo)
+grandstand(T.L-330,520,HW+24,6,true);          // reta dos boxes (lado externo)
 grandstand(S1-140,230,HW+24,4,true);               // Curva do Sol
 grandstand(0.24*T.L,120,-(HW+22),3,false);          // saída Curva do Sol
 grandstand(0.42*T.L,160,HW+22,3,false);             // Descida do Lago
@@ -441,7 +456,7 @@ grandstand(0.80*T.L,220,HW+24,4,true);              // Junção / Subida dos Box
   for(const s of[-1,1]){const p=new THREE.Mesh(new THREE.BoxGeometry(.6,8,.6),pm);const n=T.n[f.i];p.position.set(f.x+n.x*s*(HW+4.5),f.y+4,f.z+n.z*s*(HW+4.5));scene.add(p)}})();
 (function scenery(){
   // placas de frenagem e DRS
-  for(const [ci] of CORNERS){const target=new THREE.Vector3(RAW[ci][0]*SC,0,RAW[ci][1]*SC);const bi=nearest(target,0);const side=outsideOf(bi);
+  for(const [cs] of CORNERS){const bi=idxAt(cs);const side=outsideOf(bi);
     for(const d of[150,100,50]){const i=((bi-Math.round(d/T.ds))%N+N)%N;const p=T.p[i],n=T.n[i];const off=side*(HW+3.2);
       const bd=new THREE.Mesh(new THREE.BoxGeometry(1.5,1.2,.1),new THREE.MeshBasicMaterial({map:textTex(String(d),d===50?'#e10600':'#ffffff',d===50?'#fff':'#111',128,96)}));bd.position.set(p.x+n.x*off,p.y+1.0,p.z+n.z*off);bd.rotation.y=-Math.atan2(T.t[i].z,T.t[i].x);scene.add(bd)}}
   for(const z of DRS_ZONES){const f=frameAt(z.from%T.L,HW+3.4);const b=new THREE.Mesh(new THREE.BoxGeometry(.1,1.6,1.3),new THREE.MeshBasicMaterial({map:textTex('DRS','#111','#3ddc84',256,160)}));b.position.set(f.x,f.y+1.4,f.z);b.rotation.y=f.ry;scene.add(b);
@@ -463,7 +478,7 @@ grandstand(0.80*T.L,220,HW+24,4,true);              // Junção / Subida dos Box
   const leafTex=canvasTex(256,256,(x,w,h)=>{x.fillStyle='#4a7a35';x.fillRect(0,0,w,h);for(let k=0;k<2600;k++){const l=40+Math.random()*60;x.fillStyle=`hsl(${95+Math.random()*25},${35+Math.random()*25}%,${l*0.45}%)`;x.beginPath();x.arc(Math.random()*w,Math.random()*h,1.5+Math.random()*3.5,0,7);x.fill()}});leafTex.encoding=THREE.sRGBEncoding;
   const crownM=new THREE.MeshStandardMaterial({map:leafTex,roughness:.95});const trunkM=mat(0x4a3524,1);const trunkG=new THREE.CylinderGeometry(.3,.5,5,6);trunkG.translate(0,2.5,0);
   const trees=[];let tries=0;while(trees.length<(MOBILE?420:900)&&tries<12000){tries++;const i=(Math.random()*N)|0;const side=Math.random()<.5?-1:1;const off=side*(HW+28+Math.random()*150);const p=T.p[i],n=T.n[i];
-    const x=p.x+n.x*off,z=p.z+n.z*off;const j=nearest(new THREE.Vector3(x,0,z),i);const d=Math.hypot(x-T.p[j].x,z-T.p[j].z);if(d<HW+26)continue;if(z<-235*SC&&x>-200*SC&&x<380*SC)continue;if((window.__lakes||[]).some(l=>Math.hypot(x-l.x,z-l.z)<l.R*1.35+8))continue;   /* nada de árvore dentro dos lagos */trees.push([x,T.y[j]-0.8,z,0.8+Math.random()*1.1,Math.random()])}
+    const x=p.x+n.x*off,z=p.z+n.z*off;const j=nearest(new THREE.Vector3(x,0,z),i);const d=trackDist(x,z,80);if(d<HW+26)continue;   /* checa a pista toda: trechos vizinhos de Interlagos */if(nearPits(x,z))continue;if((window.__lakes||[]).some(l=>Math.hypot(x-l.x,z-l.z)<l.R*1.35+8))continue;   /* nada de árvore dentro dos lagos */trees.push([x,T.y[j]-0.8,z,0.8+Math.random()*1.1,Math.random()])}
   const cIM=new THREE.InstancedMesh(crownGeo,crownM,trees.length*3),tIM=new THREE.InstancedMesh(trunkG,trunkM,trees.length);const o=new THREE.Object3D();const col=new THREE.Color();
   trees.forEach((t,k)=>{const [x,y,z,s,r]=t;o.position.set(x,y,z);o.rotation.set(0,r*6.28,0);o.scale.setScalar(s);o.updateMatrix();tIM.setMatrixAt(k,o.matrix);
     [[0,7,0,4.4],[2.2,6,1.3,3.3],[-2,6.4,-1.4,3.5]].forEach(([ox,oy,oz,rr],q)=>{o.position.set(x+ox*s,y+oy*s,z+oz*s);o.rotation.set(r*3,r*6.28+q,0);o.scale.set(rr*s,rr*s*(0.9+r*0.2),rr*s);o.updateMatrix();cIM.setMatrixAt(k*3+q,o.matrix);col.setHSL(0.22+r*0.08,0.20+r*0.14,0.36+((k*7+q)%5)*0.035);   /* verde-oliva escuro de mata, sem cara de desenho */cIM.setColorAt(k*3+q,col)})});
@@ -645,6 +660,51 @@ const DYN={pr:0,max:0,acc:0,n:0,last:0};function dynRes(){const now=performance.
   for(let gi=0;gi<20;gi++){const s=T.L-16-gi*8,lat=(gi%2?-1:1)*3.2;const add=(ds,dl,len,wid)=>{const f=frameAt(s+ds,lat+dl);const b=new THREE.Mesh(new THREE.BoxGeometry(len,0.02,wid),wm);b.position.set(f.x,f.y+0.012,f.z);b.rotation.y=f.ry;b.receiveShadow=true;scene.add(b)};
     add(4.7,0,0.22,2.6);add(3.6,1.25,2.2,0.18);add(3.6,-1.25,2.2,0.18)}})();
 mergeStatic();
+/* ======================= COLISÃO E COMISSÁRIOS ======================= */
+const CAR_HL=2.75,CAR_HW=1.0,CAR_I=906*(5.5*5.5+2*2)/12;   /* meia-caixa e momento de inércia (kg·m²) */
+function carBox(c){const f={x:Math.cos(c.hd),z:Math.sin(c.hd)},r={x:-f.z,z:f.x};return{c:{x:c.pos.x+f.x*1.85,z:c.pos.z+f.z*1.85},f,r}}
+const _pts=[];function corners(bx){const o=[];for(const sf of[-1,1])for(const sr of[-1,1])o.push({x:bx.c.x+bx.f.x*CAR_HL*sf+bx.r.x*CAR_HW*sr,z:bx.c.z+bx.f.z*CAR_HL*sf+bx.r.z*CAR_HW*sr});return o}
+function inside(bx,p){const dx=p.x-bx.c.x,dz=p.z-bx.c.z;return Math.abs(dx*bx.f.x+dz*bx.f.z)<=CAR_HL&&Math.abs(dx*bx.r.x+dz*bx.r.z)<=CAR_HW}
+function collideCars(A,B){const dx0=B.pos.x-A.pos.x,dz0=B.pos.z-A.pos.z;if(dx0*dx0+dz0*dz0>64)return null;const a=carBox(A),b=carBox(B);const d={x:b.c.x-a.c.x,z:b.c.z-a.c.z};
+  let best=1e9,n=null;for(const ax of[a.f,a.r,b.f,b.r]){const pa=CAR_HL*Math.abs(a.f.x*ax.x+a.f.z*ax.z)+CAR_HW*Math.abs(a.r.x*ax.x+a.r.z*ax.z);const pb=CAR_HL*Math.abs(b.f.x*ax.x+b.f.z*ax.z)+CAR_HW*Math.abs(b.r.x*ax.x+b.r.z*ax.z);
+    const dist=d.x*ax.x+d.z*ax.z;const ov=pa+pb-Math.abs(dist);if(ov<=0)return null;if(ov<best){best=ov;n=dist<0?{x:-ax.x,z:-ax.z}:{x:ax.x,z:ax.z}}}
+  /* ponto de contato: média dos cantos de um carro dentro do outro */
+  let px=0,pz=0,k=0;for(const p of corners(a))if(inside(b,p)){px+=p.x;pz+=p.z;k++}for(const p of corners(b))if(inside(a,p)){px+=p.x;pz+=p.z;k++}if(!k){px=(a.c.x+b.c.x)/2;pz=(a.c.z+b.c.z)/2}else{px/=k;pz/=k}
+  /* separa */const sep=best*0.5+0.01;A.pos.x-=n.x*sep;A.pos.z-=n.z*sep;B.pos.x+=n.x*sep;B.pos.z+=n.z*sep;
+  const rA={x:px-a.c.x,z:pz-a.c.z},rB={x:px-b.c.x,z:pz-b.c.z};const wA=A.yawRate||0,wB=B.yawRate||0;
+  const vA={x:Math.cos(A.va)*A.v-wA*rA.z,z:Math.sin(A.va)*A.v+wA*rA.x},vB={x:Math.cos(B.va)*B.v-wB*rB.z,z:Math.sin(B.va)*B.v+wB*rB.x};
+  const vr={x:vB.x-vA.x,z:vB.z-vA.z};const vn=vr.x*n.x+vr.z*n.z;if(vn>=0)return{n,vn:0,px,pz,j:0};
+  const cA=rA.x*n.z-rA.z*n.x,cB=rB.x*n.z-rB.z*n.x;const mA=A.mass,mB=B.mass;
+  const j=-(1+0.15)*vn/(1/mA+1/mB+cA*cA/CAR_I+cB*cB/CAR_I);
+  const t={x:-n.z,z:n.x};const vt=vr.x*t.x+vr.z*t.z;const jt=clamp(-vt/(1/mA+1/mB),-0.35*j,0.35*j);
+  const Jx=n.x*j+t.x*jt,Jz=n.z*j+t.z*jt;
+  const apply=(C,r,sgn,m)=>{let vx=Math.cos(C.va)*C.v+sgn*Jx/m,vz=Math.sin(C.va)*C.v+sgn*Jz/m;C.v=Math.hypot(vx,vz);if(C.v>0.5)C.va=Math.atan2(vz,vx);
+    const tq=(r.x*Jz-r.z*Jx)*sgn;C.yawRate=clamp((C.yawRate||0)+tq/CAR_I,-6,6)};
+  apply(A,rA,-1,mA);apply(B,rB,1,mB);
+  /* dano: asa dianteira se o contato foi na frente (> 1,9 m do centro), lateral/traseira leve */
+  const dv=Math.abs(vn);for(const[C,bx,p]of[[A,a,rA],[B,b,rB]]){const lon=p.x*bx.f.x+p.z*bx.f.z;const w=lon>1.9?0.07:0.025;if(dv>2.5)C.dmg=Math.min(0.5,C.dmg+dv*w*0.2);if(dv>4&&lon>1.9)C.wing=Math.min(1,(C.wing||0)+(dv-4)*0.06);   /* asa quebra acima de ~14 km/h de impacto frontal */
+    if(C.isPlayer&&dv>2&&navigator.vibrate)try{navigator.vibrate(Math.min(250,30+dv*15))}catch(e){}}
+  return{n,vn:dv,px,pz,j}}
+/* comissários: quem causou o toque? quem bateu por trás, ou quem se moveu lateralmente pra cima do outro. Pena só se o outro foi prejudicado. */
+const INQ=[];
+function judgeContact(A,B,h){if(window.__dbg&&window.__dbg.onContact)window.__dbg.onContact(A,B,h);if(h.vn<2.2||race.state!=='racing')return;const pair=[A,B];if(pair.some(c=>c.lastInq&&race.time-c.lastInq<3))return;
+  const f=c=>({x:Math.cos(c.hd),z:Math.sin(c.hd)});const rel=(X,Y)=>{const fx=f(X);return (Y.pos.x-X.pos.x)*fx.x+(Y.pos.z-X.pos.z)*fx.z};
+  let culprit=null;const aBehind=rel(A,B)>2.5&&Math.abs(wrapA(A.hd-B.hd))<0.6,bBehind=rel(B,A)>2.5&&Math.abs(wrapA(A.hd-B.hd))<0.6;
+  if(aBehind)culprit=A;else if(bBehind)culprit=B;   /* velocidades já são pós-impacto: quem estava atrás e fechou (vn>2,2) é o culpado */
+  else{const lat=c=>{const i=c.sIdx;const n=T.n[i];return(Math.cos(c.va)*n.x+Math.sin(c.va)*n.z)*c.v};const side=Math.sign((B.pos.x-A.pos.x)*T.n[A.sIdx].x+(B.pos.z-A.pos.z)*T.n[A.sIdx].z);
+    const toward=(c,s)=>lat(c)*s;const ta=toward(A,side),tb=toward(B,-side);if(Math.max(ta,tb)>1.2)culprit=ta>tb?A:B}
+  if(!culprit)return;const victim=culprit===A?B:A;A.lastInq=B.lastInq=race.time;
+  INQ.push({culprit,victim,t:race.time,sev:h.vn,off0:victim.offTrack,dmg0:victim.dmg});
+  if(culprit.isPlayer||victim.isPlayer)race.toast('INVESTIGAÇÃO',`Toque entre ${culprit.d.c} e ${victim.d.c}`)}
+function checkInvestigations(){for(let k=INQ.length-1;k>=0;k--){const q=INQ[k];const v=q.victim;if(Math.abs(v.yawRate||0)>1.6)q.spun=true;if(race.time-q.t<2.5)continue;INQ.splice(k,1);
+  const harmed=q.spun||v.offTrack>q.off0+0.4||v.dmg>q.dmg0+0.03||q.sev>7;const pen=q.sev>8?10:5;
+  if(harmed){q.culprit.penalty+=pen;if(q.culprit.isPlayer)race.toast('PENALIDADE +'+pen+' s','Causou colisão com '+v.d.c);else if(v.isPlayer)race.toast(q.culprit.d.c+' PUNIDO','+'+pen+' s por causar colisão')}
+  else if(q.culprit.isPlayer||v.isPlayer)race.toast('SEM AÇÃO','Toque de corrida')}}
+/* limites de pista (jogador): as 4 rodas além da linha branca = volta anulada + aviso; a partir do 4º, +5 s */
+function trackLimits(c){const out=Math.abs(c.latNow||0)>HW+CAR_HW+0.15&&c.v>8;if(out&&!c.tlOut){c.tlCount=(c.tlCount||0)+1;c.lapOK=false;
+    if(c.tlCount<3)race.toast('LIMITE DE PISTA','Aviso '+c.tlCount+' · volta anulada');else if(c.tlCount===3)race.toast('BANDEIRA PRETA E BRANCA','Próxima infração: +5 s');else{c.penalty+=5;race.toast('PENALIDADE +5 s','Limites de pista')}}
+  c.tlOut=out}
+
 /* ======================= EFEITOS ======================= */
 /* faíscas do assoalho (prancha de titânio): compressões da pista, zebras e frenagem forte em alta */
 const sparks=(function(){const MAX=MOBILE?220:700;const geo=new THREE.BufferGeometry();const pos=new Float32Array(MAX*3),vel=new Float32Array(MAX*3),life=new Float32Array(MAX);
@@ -667,17 +727,19 @@ const fx=(function(){const MAXP=600;const geo=new THREE.BufferGeometry();const p
       geo.attributes.position.needsUpdate=true;geo.attributes.aLife.needsUpdate=true;geo.attributes.aSize.needsUpdate=true}}})();
 
 /* ======================= CÂMERAS DE TV ======================= */
-const TVCAMS=[];for(const [ci] of CORNERS){const bi=nearest(new THREE.Vector3(RAW[ci][0]*SC,0,RAW[ci][1]*SC),0);const i=((bi-Math.round(60/T.ds))%N+N)%N;const p=T.p[i],n=T.n[i];const off=outsideOf(bi)*(HW+11);
+const TVCAMS=[];for(const [cs] of CORNERS){const bi=idxAt(cs);const i=((bi-Math.round(60/T.ds))%N+N)%N;const p=T.p[i],n=T.n[i];const off=outsideOf(bi)*(HW+11);
   TVCAMS.push({s:i*T.ds,pos:new THREE.Vector3(p.x+n.x*off,p.y+6.5,p.z+n.z*off)})}
 TVCAMS.push({s:T.L-300,pos:(()=>{const f=frameAt(T.L-300,-(HW+8));return new THREE.Vector3(f.x,f.y+3.2,f.z)})()});
 TVCAMS.sort((a,b)=>a.s-b.s);
 /* ======================= FÍSICA ======================= */
+/* pneu e aerodinâmica de F1 2025: ~2,3 g em curva lenta, ~4,9 g a 250 km/h, ~6 g de frenagem */
+const MU0=2.0,CLA=5.0;
 const G=9.81,RHO=1.2,WR=0.36,WB=3.6,GEARS=[14.8,11.0,8.9,7.5,6.5,5.7,5.1,4.67],RPM_MAX=12000;
 const enginePower=rpm=>{ // kW ICE 2025 (~630 kW no pico)
   const x=rpm/RPM_MAX;const f=x<0.4?0.25+x*0.9:x<0.95?0.61+(x-0.4)*0.71:1.0-(x-0.95)*1.8;return 630e3*clamp(f,0.2,1)};
 class Car{
   constructor(d,isPlayer,compound){
-    this.d=d;this.team=TEAMS[d.t];this.isPlayer=isPlayer;this.pos=new THREE.Vector3();this.hd=0;this.va=0;this.v=0;this.yaw=0;
+    this.d=d;this.team=TEAMS[d.t];this.carPerf=TEAMS[d.t].pace;this.isPlayer=isPlayer;this.pos=new THREE.Vector3();this.hd=0;this.va=0;this.v=0;this.yaw=0;
     this.gear=1;this.rpm=4000;this.throttle=0;this.brake=0;this.steer=0;this.drsOpen=false;this.drsOK=false;this.ersDeploy=false;this.ers=4e6;this.fuel=110;
     this.setTyres(compound);this.lap=0;this.sIdx=0;this.s=0;this.prevS=0;this.lapStart=0;this.cur=[0,0,0];this.secT=[null,null,null];this.bestSec=[null,null,null];this.best=null;this.last=null;this.sector=0;
     this.cp=new Array(96).fill(null);this.finished=false;this.finishT=null;this.inPit=false;this.pitReq=false;this.pitU=0;this.pitStop=0;this.pitDone=false;this.stops=0;this.compUsed=new Set([compound]);
@@ -701,11 +763,11 @@ class Car{
         this.dmg=Math.min(0.5,this.dmg+(-vn)*0.004);this.wallHit=Math.max(this.wallHit||0,-vn);if(this.isPlayer&&navigator.vibrate)try{navigator.vibrate(Math.min(220,40+(-vn)*12))}catch(e){}}}
     this.surf=surfMu;this.kerbBuzz=(this.kerbBuzz||0)-dt;this.onKerb=bump;this.latNow=lat;
     // aero
-    const drsF=this.drsOpen?1:0;const CdA=1.05-0.2*drsF,ClA=3.6-0.6*drsF;
-    const drag=0.5*RHO*CdA*v*v, DF=0.5*RHO*ClA*v*v;
+    const drsF=this.drsOpen?1:0;const CdA=1.05-0.2*drsF,ClA=CLA-0.9*drsF;
+    const drag=0.5*RHO*CdA*v*v, DF=0.5*RHO*ClA*v*v*(1-0.35*(this.wing||0));   /* asa dianteira danificada perde downforce */
     // pneu
     const tAvg=(this.temp[0]+this.temp[1]+this.temp[2]+this.temp[3])/4;const tf=clamp(1-Math.pow((tAvg-this.comp.opt)/70,2),0.55,1);
-    const mu=1.62*this.comp.mu*tf*(1-0.28*this.wear)*surfMu*(1-0.25*this.dmg)*(this.ai?this.ai.skill:1);
+    const mu=MU0*this.comp.mu*tf*(1-0.28*this.wear)*surfMu*(1-0.25*this.dmg)*this.carPerf;
     const Fmax=mu*(m*G+DF);
     // motor / freio
     this.rpm=clamp(v/WR*GEARS[this.gear-1]*60/(2*Math.PI),3500,RPM_MAX+200);
@@ -741,7 +803,7 @@ class Car{
     yawDes+=this.spin*this.throttle*Math.sign(st||1)*1.6*(1-Math.abs(slipA)*2);   // oversteer com roda patinando
     yawDes*=clamp(1-(Math.abs(slipA)-0.07)*5,0.4,1);                                            // pneus saturados: subesterço
     if(bump)yawDes+=Math.sin(race.time*40)*0.06*clamp(this.v/40,0,1);
-    this.hd+=yawDes*dt;
+    this.hd+=yawDes*dt;if(this.yawRate){this.hd+=this.yawRate*dt;this.yawRate*=Math.exp(-dt*(this.v>5?2.2:4))}
     const dvaMax=(Fmax/m)/Math.max(this.v,3);
     const need=wrapA(this.hd-this.va);
     const turn=clamp(need*14,-dvaMax,dvaMax);
@@ -821,32 +883,38 @@ let VPROF=null;
 /* linha de corrida estilo F1 25: verde acelera, amarelo alivia, vermelho freia (pelo perfil de velocidade ~40 m à frente) */
 function colorRacingLine(){const col=rlMesh.geometry.attributes.color;const G=new THREE.Color(0.15,0.9,0.35),Y=new THREE.Color(1,0.8,0.1),Rr=new THREE.Color(1,0.12,0.1),c=new THREE.Color();const ahead=Math.round(40/T.ds);
   for(let i=0;i<=N;i++){const j=i%N;const dv=VPROF[(j+ahead)%N]-VPROF[j];const t=clamp(-dv/18,0,1);t<0.25?c.copy(G):t<0.55?c.copy(G).lerp(Y,(t-0.25)/0.3):c.copy(Y).lerp(Rr,Math.min(1,(t-0.55)/0.3));c.convertSRGBToLinear();col.setXYZ(i*2,c.r,c.g,c.b);col.setXYZ(i*2+1,c.r,c.g,c.b)}col.needsUpdate=true}
-function buildProfile(){const m=798+108;const mu=1.62;const v=new Array(N);
-  for(let i=0;i<N;i++){const k=Math.abs(Ksharp[i])+1e-5;let vv=60;for(let it=0;it<6;it++){const DF=0.5*RHO*3.6*vv*vv;vv=Math.sqrt(mu*(G+DF/m)/k)}v[i]=Math.min(vv,98)}
-  for(let pass=0;pass<2;pass++){for(let j=0;j<N*2;j++){const i=(N-1-(j%N)+N)%N,nx=(i+1)%N;const vn=v[nx];const DF=0.5*RHO*3.6*vn*vn;const aMax=mu*(G+DF/m);const latFr=Math.min(1,vn*vn*Math.abs(Ksharp[nx])/aMax);const aB=aMax*Math.sqrt(1-latFr*latFr)*0.9;v[i]=Math.min(v[i],Math.sqrt(vn*vn+2*aB*T.ds))}
-    for(let j=0;j<N*2;j++){const i=j%N,nx=(i+1)%N;const vi=v[i];const DF=0.5*RHO*3.6*vi*vi;const aA=Math.min(enginePower(9500)/(m*Math.max(vi,5))-0.5*RHO*1.05*vi*vi/m,mu*(G+DF/m)*0.7);v[nx]=Math.min(v[nx],Math.sqrt(vi*vi+2*Math.max(aA,0.5)*T.ds))}}
+function buildProfile(){const m=798+108;const mu=MU0;const v=new Array(N);
+  for(let i=0;i<N;i++){const k=Math.abs(KLINE[i])+1e-5;let vv=60;   /* curvatura da trajetória real seguida */for(let it=0;it<6;it++){const DF=0.5*RHO*CLA*vv*vv;vv=Math.sqrt(mu*(G+DF/m)/k)}v[i]=Math.min(vv,98)}
+  for(let pass=0;pass<2;pass++){for(let j=0;j<N*2;j++){const i=(N-1-(j%N)+N)%N,nx=(i+1)%N;const vn=v[nx];const DF=0.5*RHO*CLA*vn*vn;const aMax=mu*(G+DF/m);const latFr=Math.min(1,vn*vn*Math.abs(KLINE[nx])/aMax);const aB=aMax*Math.sqrt(1-latFr*latFr)*0.9;v[i]=Math.min(v[i],Math.sqrt(vn*vn+2*aB*T.ds))}
+    for(let j=0;j<N*2;j++){const i=j%N,nx=(i+1)%N;const vi=v[i];const DF=0.5*RHO*CLA*vi*vi;const aA=Math.min((enginePower(9500)+120e3)/(m*Math.max(vi,5))   /* motor + ERS */-0.5*RHO*1.05*vi*vi/m,mu*(G+DF/m)*0.7);v[nx]=Math.min(v[nx],Math.sqrt(vi*vi+2*Math.max(aA,0.5)*T.ds))}}
   VPROF=v}
 class AI{
-  constructor(car,base){this.car=car;car.ai=this;this.skill=base*car.d.sk*TEAMS[car.d.t].pace;this.lat=0;this.latT=0;this.noise=0;this.nT=0;this.pitLap=null;this.aggr=0.5+Math.random()*0.5;this.lapMul=1}
+  constructor(car,base){this.car=car;car.ai=this;this.skill=base*car.d.sk;this.lat=0;this.latT=0;this.noise=0;this.nT=0;this.pitLap=null;this.aggr=0.5+Math.random()*0.5;this.lapMul=1}
   drive(dt,race){const c=this.car;if(c.inPit)return;const v=c.v;
     if(race.state!=='racing'){c.throttle=0;c.brake=1;return}
     const i=c.sIdx;const look=Math.round((6+v*0.3)/T.ds);const tAvg=(c.temp[0]+c.temp[1]+c.temp[2]+c.temp[3])/4;const gf=clamp(1-Math.pow((tAvg-c.comp.opt)/70,2),0.55,1)*(1-0.28*c.wear)*(1-0.25*c.dmg)*c.comp.mu;
     const ti=(i+look)%N;const p0=T.p[i],n0=T.n[i];const myLat=(c.pos.x-p0.x)*n0.x+(c.pos.z-p0.z)*n0.z;
     // alvo lateral: linha de corrida + desvio para ultrapassagem
     this.nT-=dt;if(this.nT<=0){this.nT=0.6+Math.random();this.noise=(Math.random()-.5)*0.5}
-    const ahead=race.carAheadSpatial(c,30);let target=RL[ti];
-    if(ahead){const dv=v-ahead.v;const d=ahead.dist;const latA=ahead.lat;
-      if(dv>-2&&d<24&&this.aggr>0.3&&ahead.dlat<3&&race.time>12){const side=latA>0?-1:1;target=clamp(latA+side*3.6,-HW+1.2,HW-1.2)}
-      if(ahead.dlat<2.4&&d<26){this.follow=clamp((d-7)/16,0,1);if(d<11&&dv>0){c.brake=clamp(dv*0.3,0,1)}}else this.follow=1}else this.follow=1;
+    const ahead=race.carAheadSpatial(c,30);let target=RL[ti];this.follow=1;this.gapCap=1e9;
+    /* tráfego: segue o carro da frente na mesma faixa com intervalo de ~0,22 s (+6,5 m entre eixos); tenta passar pelo lado livre */
+    const lane=race.carAheadLane(c,50);
+    if(lane){const g=6.5+v*0.22;if(lane.dist<g+30)this.gapCap=Math.max(0,lane.v+(lane.dist-g)*0.8);
+      if((v-lane.v>-1&&lane.dist<26&&this.aggr>0.3&&race.time>13)||(v-lane.v>5&&lane.dist<40)){   /* desvia de carro lento/parado mesmo na largada */const side=lane.lat>0?-1:1;target=clamp(lane.lat+side*3.4,-HW+1.2,HW-1.2)}}
+    /* largada: cada carro segue na sua fila do grid e só converge para a linha de corrida depois de ~7 s */
+    if(this.gridLat==null)this.gridLat=myLat;if(race.time<13){const k=clamp((race.time-7)/6,0,1);target=lerp(this.gridLat,target,k*k)}
+    /* lado a lado: nunca fecha a porta, mantém 2,9 m de separação lateral */
+    for(const o of race.cars){if(o===c||o.inPit)continue;let dd=(o.sIdx-c.sIdx);if(dd<-N/2)dd+=N;if(dd>N/2)dd-=N;dd*=T.ds;if(Math.abs(dd)>7)continue;
+      const ol=(o.pos.x-p0.x)*n0.x+(o.pos.z-p0.z)*n0.z;const sep=myLat-ol;if(Math.abs(sep)<2.9){target=clamp(ol+(sep>=0?1:-1)*2.9,-HW+1.0,HW-1.0)}}
     const want=target+this.noise;const maxStep=(1.2+v*0.02)*dt;this.lat+=clamp(want-this.lat,-maxStep,maxStep);
     // direção: curvatura da pista à frente (feed-forward) + correção de rumo e de posição lateral
     const kff=Ksharp[(i+Math.round((3+v*0.1)/T.ds))%N];const hdTrack=Math.atan2(T.t[i].z,T.t[i].x);const hdErr=wrapA(hdTrack-c.hd);const latErr=this.lat-myLat;
     let steerAng=Math.atan(WB*kff)+1.4*hdErr+Math.atan(1.1*latErr/(v+5));
-    const steerMax=0.42/(1+v/22);const DF=0.5*RHO*3.6*v*v;const kLim0=1.62*this.skill*gf*(G+DF/c.mass)/(v*v+4);const bfrac=clamp(c.brake*1.05,0,0.95);const kLim=kLim0*Math.sqrt(1-bfrac*bfrac)*1.04;const sLim=Math.atan(kLim*WB);steerAng=clamp(steerAng,-sLim,sLim);c.steer=clamp(steerAng/steerMax,-1,1);
+    const steerMax=0.42/(1+v/22);const DF=0.5*RHO*CLA*v*v;const kLim0=MU0*c.carPerf*gf*(G+DF/c.mass)/(v*v+4);const bfrac=clamp(c.brake*1.05,0,0.95);const kLim=kLim0*Math.sqrt(1-bfrac*bfrac)*1.04;const sLim=Math.atan(kLim*WB);steerAng=clamp(steerAng,-sLim,sLim);c.steer=clamp(steerAng/steerMax,-1,1);
     // velocidade alvo
     let vt=1e9;const horizon=Math.round(Math.max(40,v*3.2)/T.ds);
-    for(let j=0;j<=horizon;j+=2){const ii=(i+j)%N;const vp=VPROF[ii]*Math.sqrt(this.skill*gf)*0.97*this.lapMul;const aB=0.8*1.62*this.skill*gf*(G+0.5*RHO*3.6*vp*vp/c.mass);const vb=Math.sqrt(vp*vp+2*aB*j*T.ds);if(vb<vt)vt=vb}
-    if(c.surf<0.7){vt=Math.min(vt,14);this.lat=lerp(this.lat,0,dt*2)}
+    for(let j=0;j<=horizon;j+=2){const ii=(i+j)%N;const vp=VPROF[ii]*Math.sqrt(this.skill*gf)*0.97*this.lapMul;const aB=0.8*MU0*this.skill*gf*(G+0.5*RHO*CLA*vp*vp/c.mass);const vb=Math.sqrt(vp*vp+2*aB*j*T.ds);if(vb<vt)vt=vb}
+    vt=Math.min(vt,this.gapCap);if(c.surf<0.7){vt=Math.min(vt,14);this.lat=lerp(this.lat,0,dt*2)}
     const err=vt-v;
     if(!(ahead&&ahead.dist<11&&v-ahead.v>0&&ahead.dlat<2.4)){c.throttle=clamp(err*0.6+0.1,0,1)*this.follow;const latUse=Math.min(0.85,Math.abs(kff)*v*v/(kLim0*(v*v+4)));const bMax=Math.sqrt(1-latUse*latUse)*0.95/1.05;c.brake=Math.min(clamp(-err*0.8,0,1),bMax)}
     if(race.state==='racing'&&v<3)c.throttle=1;if(c.slip>0.3&&v>20)c.throttle*=0.6;if(Math.abs(myLat)>HW-1.2&&Math.sign(myLat)===-Math.sign(Ksm[i]||1)&&v>15)c.throttle*=0.4;
@@ -866,6 +934,7 @@ const race={state:'menu',time:0,laps:5,cars:[],player:null,fastest:null,fastestB
   order(){return this.cars.slice().sort((a,b)=>{if(a.finished&&b.finished)return a.finishT-b.finishT;if(a.finished!==b.finished)return a.finished?-1:1;return (b.lap*T.L+b.s)-(a.lap*T.L+a.s)})},
   carAhead(c){const o=this.order();const i=o.indexOf(c);return i>0?o[i-1]:null},
   gapTo(c,a){const cpi=Math.floor(c.s/T.L*96)%96;const mine=c.cp[cpi],his=a.cp[cpi];if(!mine||!his)return 99;if(his.lap>mine.lap)return 99;return mine.t-his.t},
+  carAheadLane(c,maxD){let best=null;const n=T.n[c.sIdx],p=T.p[c.sIdx];const myLat=(c.pos.x-p.x)*n.x+(c.pos.z-p.z)*n.z;for(const o of this.cars){if(o===c||o.inPit)continue;let d=(o.sIdx-c.sIdx);if(d<-N/2)d+=N;if(d>N/2)d-=N;d*=T.ds;if(d<=0.5||d>maxD)continue;const lat=(o.pos.x-p.x)*n.x+(o.pos.z-p.z)*n.z;if(Math.abs(lat-myLat)>2.3)continue;if(!best||d<best.dist)best={car:o,dist:d,lat,v:o.v}}return best},
   carAheadSpatial(c,maxD){let best=null;for(const o of this.cars){if(o===c||o.inPit)continue;let d=(o.sIdx-c.sIdx);if(d<-N/2)d+=N;if(d>N/2)d-=N;d*=T.ds;if(d>0.5&&d<maxD){const n=T.n[c.sIdx],p=T.p[c.sIdx];const lat=(o.pos.x-p.x)*n.x+(o.pos.z-p.z)*n.z;const myLat=(c.pos.x-p.x)*n.x+(c.pos.z-p.z)*n.z;if(!best||d<best.dist)best={car:o,dist:d,lat,dlat:Math.abs(lat-myLat),v:o.v}}}return best},
 };
 function setup(){
@@ -915,14 +984,14 @@ function readInput(dt){const c=race.player;if(!c)return;
   if(touch.axis!=null&&touch.axis!==0){steerIn=lerp(steerIn,touch.axis,Math.min(1,dt*18))}else if(gp&&st){steerIn=st}else if(L&&!R)steerIn=Math.max(-1,steerIn-rate);else if(R&&!L)steerIn=Math.min(1,steerIn+rate);else steerIn*=Math.max(0,1-dt*14);
   c.steer=steerIn;
   if(race.opt.steerAssist&&!(gp&&st)&&c.v>3){   /* teclado: A/D pedem curvatura, limitada a 92% do grip (estilo assistência de direção do F1 25) */
-    const v=c.v,m=c.mass,DF=0.5*RHO*3.6*v*v;const tAvg=(c.temp[0]+c.temp[1]+c.temp[2]+c.temp[3])/4;const tf=clamp(1-Math.pow((tAvg-c.comp.opt)/70,2),0.55,1);
-    const mu=1.62*c.comp.mu*tf*(1-0.28*c.wear)*(c.surf||1)*(1-0.25*c.dmg);const kGrip=0.92*mu*(G+DF/m)/(v*v);
+    const v=c.v,m=c.mass,DF=0.5*RHO*CLA*v*v;const tAvg=(c.temp[0]+c.temp[1]+c.temp[2]+c.temp[3])/4;const tf=clamp(1-Math.pow((tAvg-c.comp.opt)/70,2),0.55,1);
+    const mu=MU0*c.comp.mu*tf*(1-0.28*c.wear)*(c.surf||1)*(1-0.25*c.dmg);const kGrip=0.92*mu*(G+DF/m)/(v*v);
     const sMax=0.42/(1+v/22);const kGeo=Math.tan(sMax)/WB;const k=steerIn*Math.min(kGrip,kGeo);c.steer=clamp(Math.atan(k*WB)/sMax,-1,1)}
   th=Math.max(th,(keys.KeyW||keys.ArrowUp||touch.gas)?1:0);br=Math.max(br,(keys.KeyS||keys.ArrowDown||touch.brake)?1:0);
   if(race.opt.autoGas&&!br)th=1;   /* acelerador automático: só solta quando freia */
   if(race.state!=='racing'){br=1;th=0;if(race.state==='lights'&&(keys.KeyW||keys.ArrowUp||touch.gas))th=0.001}
   if(race.opt.brakeAssist&&race.state==='racing'&&!c.inPit&&VPROF){const v=c.v,i=c.sIdx;let vt=1e9;const hz=Math.round(Math.max(40,v*3.2)/T.ds);
-    for(let j=0;j<=hz;j+=2){const ii=(i+j)%N;const vp=VPROF[ii]*0.95;const aB=0.8*1.62*c.comp.mu*(G+0.5*RHO*3.6*vp*vp/c.mass);const vb=Math.sqrt(vp*vp+2*aB*j*T.ds);if(vb<vt)vt=vb}
+    for(let j=0;j<=hz;j+=2){const ii=(i+j)%N;const vp=VPROF[ii]*0.90;const aB=0.75*MU0*c.comp.mu*(G+0.5*RHO*CLA*vp*vp/c.mass);const vb=Math.sqrt(vp*vp+2*aB*j*T.ds);if(vb<vt)vt=vb}
     if(v>vt){br=Math.max(br,clamp((v-vt)*0.6,0,1));th=Math.min(th,0)}c.assistBrake=v>vt}
   c.throttle=lerp(c.throttle,th,dt*12);c.brake=lerp(c.brake,br,dt*14);
   if((keys.Space||touch.drs)&&c.inDRSZone&&c.drsOK&&!c.inPit)c.drsOpen=true;
@@ -1032,7 +1101,7 @@ function hud(dt){const c=race.player;if(!c)return;hudT+=dt;
   if(hudT>0.25){hudT=0;const o=race.order();let h='<div class="hd">GP SÃO PAULO · V'+Math.min(Math.max(race.player.lap,1),race.laps)+'</div>';
     const pi=o.indexOf(race.player);
     o.forEach((x,i)=>{let g='';const far=!(i<3||Math.abs(i-pi)<=1);if(i===0)g=x.finished?'VENC':'Líder';else{const a=o[i-1];if(x.finished&&a.finished)g='+'+(x.finishT-a.finishT).toFixed(1);else{const gp=race.gapTo(x,a);g=gp>=99?'+1 V':'+'+gp.toFixed(1)}}
-      h+=`<div class="r${x.isPlayer?' me':''}${x.inPit?' pit':''}${far?' far':''}"><span class="p">${i+1}</span><span class="c" style="background:${x.team.c}"></span><span>${x.d.c}</span><span class="g${x.drsOpen?' drs':''}">${x.inPit?'PIT':g}</span></div>`});
+      h+=`<div class="r${x.isPlayer?' me':''}${x.inPit?' pit':''}${far?' far':''}"><span class="p">${i+1}</span><span class="c" style="background:${x.team.c}"></span><span>${x.d.c}${x.penalty?'<i class="pen">+'+x.penalty+'</i>':''}</span><span class="g${x.drsOpen?' drs':''}">${x.inPit?'PIT':g}</span></div>`});
     $('tower').innerHTML=h;
     let ty='';for(const w of[0,1,2,3]){const t=c.temp[w];const col=t<75?'#4aa3ff':t<115?'#3ddc84':t<135?'#ffd23f':'#ff3b3b';ty+=`<div class="t" style="background:${col}">${Math.round(t)}°</div>`}
     ty+=`<div class="cmp"><span class="ring" style="--cc:${c.comp.col}">${c.comp.n}</span><span>${c.comp.full}<br><span style="color:var(--mut)">desgaste ${Math.round(c.wear*100)}% · paradas ${c.stops}</span></span></div>`;$('tyres').innerHTML=ty;
@@ -1049,11 +1118,10 @@ function step(dt){if(race.paused)return;race.time+=dt;
   if(race.state==='racing'&&!race.drsEnabled&&race.player&&race.order()[0].lap>=3){race.drsEnabled=true;race.toast('DRS LIBERADO','')}
   readInput(dt);
   for(const c of race.cars){if(c.ai)c.ai.drive(dt,race);c.update(dt,null,race.opt,race)}
-  // colisões
-  const cs=race.cars;for(let a=0;a<cs.length;a++)for(let b=a+1;b<cs.length;b++){const A=cs[a],B=cs[b];if(A.inPit||B.inPit)continue;const dx=B.pos.x-A.pos.x,dz=B.pos.z-A.pos.z;const d2=dx*dx+dz*dz;if(d2>36)continue;
-    const d=Math.sqrt(d2)||0.01;const ux=dx/d,uz=dz/d;const fa=Math.abs(Math.cos(Math.atan2(uz,ux)-A.hd));const minD=2.2+3.2*fa;if(d<minD){const push=(minD-d)/2;A.pos.x-=ux*push;A.pos.z-=uz*push;B.pos.x+=ux*push;B.pos.z+=uz*push;
-      const rel=A.v-B.v;const ahead=((B.pos.x-A.pos.x)*Math.cos(A.hd)+(B.pos.z-A.pos.z)*Math.sin(A.hd))>0;if(ahead&&rel>0){A.v-=rel*0.5;B.v+=rel*0.3}else if(!ahead&&rel<0){B.v+=rel*0.5;A.v-=rel*0.3}
-      const kick=Math.min(0.6,Math.abs(rel)*0.05)*dt;A.hd+=uz*kick;B.hd-=uz*kick;const dd=Math.abs(rel)*0.04*dt;A.dmg=Math.min(0.5,A.dmg+dd);B.dmg=Math.min(0.5,B.dmg+dd)}}
+  if(race.state==='racing'&&race.player&&!race.player.inPit)trackLimits(race.player);
+  // colisões: caixas orientadas (5,5 x 2,0 m), impulso no ponto de contato (restituição 0,15, atrito 0,35), giro pelo braço de alavanca, dano na asa
+  const cs=race.cars;for(let a=0;a<cs.length;a++)for(let b=a+1;b<cs.length;b++){const A=cs[a],B=cs[b];if(A.inPit||B.inPit)continue;const hit=collideCars(A,B);if(hit)judgeContact(A,B,hit)}
+  checkInvestigations();
   // fim de corrida
   if(race.state==='racing'){const allDone=race.cars.every(c=>c.finished);const leaderDone=race.cars.some(c=>c.finished);if(!race.endT&&leaderDone)race.endT=race.time+90;if(allDone||(race.endT&&race.time>race.endT)||(race.player.finished&&race.time>race.player.finishT+8)){race.state='finished';showResults()}}
 }
@@ -1073,7 +1141,7 @@ if(POST){composer=new THREE.EffectComposer(renderer);composer.addPass(new THREE.
 let lastCW=0,lastCH=0;
 /* tamanho vem do canvas na tela (não de innerWidth): no celular o evento de resize chega antes do tamanho final ao girar ou com a barra do navegador */
 function resize(){const w=Math.max(1,canvas.clientWidth||innerWidth),h=Math.max(1,canvas.clientHeight||innerHeight);lastCW=w;lastCH=h;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();if(composer){const pr=renderer.getPixelRatio();composer.setPixelRatio(pr);composer.setSize(w,h);smaaPass.setSize(w*pr,h*pr)}}addEventListener('resize',resize);addEventListener('orientationchange',()=>setTimeout(resize,250));resize();
-requestAnimationFrame(frame);window.__dbg.step=step;window.__dbg.DT=DT;window.__dbg.tick=tick;window.__dbg.audio=audio;
+requestAnimationFrame(frame);window.__dbg.step=step;window.__dbg.DT=DT;window.__dbg.tick=tick;window.__dbg.AI=AI;window.__dbg.audio=audio;
 /* ======================= MENU / RESULTADOS ======================= */
 let selDriver='VER';
 (function waitModels(){const b=$('go');const st=$('mstat');if(MODELS.ready||MODELS.prog>=1){b.disabled=false;b.textContent='Largar';st.textContent=MODELS.errs.length?('Carros 3D: '+MODELS.ok+'/'+MODELS.total+' carregados · erro: '+MODELS.errs[0].slice(0,140)):('Carros 3D: '+MODELS.ok+'/'+MODELS.total+' carregados');st.style.color=MODELS.errs.length?'#ff6b6b':'';return}b.disabled=true;b.textContent='Carregando carros… '+Math.round(MODELS.prog*100)+'%';setTimeout(waitModels,200)})();

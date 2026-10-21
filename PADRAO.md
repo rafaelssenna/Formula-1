@@ -18,19 +18,34 @@ Valores de referência de um F1 2025. Se uma mudança tirar algum destes da faix
 
 | Medida | Alvo | Como medir |
 |---|---|---|
-| Frenagem 300 → 100 km/h | 1,8 a 2,1 s, 90 a 105 m, sem travar | `QA.checks()` |
-| Velocidade máxima (DRS fechado) | 320 a 340 km/h | telemetria do líder |
-| Volta da IA em Interlagos | 1:10 a 1:20 | melhor volta após 3 voltas |
-| IA fora da pista | 0 s por volta nos 10 primeiros | `offTrack` |
-| Pneus | 80 a 110 °C em ritmo | HUD |
+| Pneu e aerodinâmica | atrito 2,0; ClA 5,0 m² (DRS −0,9); CdA 1,05 | constantes `MU0`, `CLA` |
+| Aceleração lateral | ~2,3 g a 100 km/h; ~5 g a 250 km/h | fórmula `MU0·(g + ½ρ·ClA·v²/m)` |
+| Frenagem 300 → 100 km/h | 1,3 a 1,6 s, 65 a 80 m, sem travar | `QA.checks()` |
+| Velocidade máxima | 320 a 340 km/h | perfil `VPROF` |
+| Volta ideal (perfil) | ~1:15 | soma `ds/VPROF` |
+| IA Fácil / Médio / Difícil / Lendário | ~1:24 / ~1:19 / ~1:18 / ~1:17 (mediana) | `QA.raceStats()` |
+| Jogador com assistências (bot de teclado) | ~1:18 a 1:20, 0 s fora | `QA.kbBot()` |
+| Corrida neutra de 4 min | ~10 contatos (maioria na largada), ≤ 3 asas quebradas | `QA.raceStats()` |
 
 Regras:
+- Carro e pneu iguais para todos; só `TEAMS[].pace` muda a aderência (diferença entre equipes). A dificuldade muda o quão perto do limite a IA pilota, nunca a aderência.
+- Perfil de velocidade (`VPROF`) usa a curvatura da trajetória realmente seguida (`KLINE`, linha de corrida medida em ±15 m) e motor + ERS (120 kW). Acima de ~1,10 de fator a IA passa do limite: não subir as dificuldades além disso.
 - Círculo de atrito só com força de pneu (motor, freio, curva). Arrasto e gravidade ficam fora.
 - Freio no limite do grip (0,98 × Fmax). Trava só se somar com curva ou na grama.
 - Guinada limitada pelo grip dianteiro: volante todo em alta dá subesterço, não pião.
 - Gravidade na rampa entra na força longitudinal (subida freia, descida empurra).
 - Mureta: impulso na normal (restituição 0,25), atrito na tangente, dano pela velocidade normal. Nunca teleportar o carro.
+- Carro x carro: caixas orientadas 5,5 × 2,0 m, impulso no ponto de contato (restituição 0,15, atrito 0,35), giro pelo braço de alavanca (`yawRate`, amortecido pelos pneus). Asa dianteira quebra acima de ~14 km/h de impacto frontal e tira até 35% do downforce.
 - O carro se apoia nos **dois eixos**: altura = média das alturas da pista sob cada eixo; arfagem = inclinação entre eles.
+
+### IA em tráfego
+- Mantém intervalo de ~0,22 s (+6,5 m entre eixos) do carro da frente na mesma faixa; ultrapassa pelo lado livre; lado a lado nunca fecha (2,9 m de separação).
+- Largada: cada carro fica na sua fila do grid por ~7 s; desvia de carro muito mais lento mesmo nesse período.
+
+### Comissários (FIA)
+- Toque com impacto > 2,2 m/s abre investigação. Culpado: quem estava atrás (batida traseira) ou quem se moveu lateralmente pra cima do outro.
+- Pena só se a vítima foi prejudicada (rodou, saiu da pista, teve dano) ou impacto > 7 m/s: +5 s, ou +10 s acima de 8 m/s. Vale para jogador e IA.
+- Limites de pista (jogador): 4 rodas além da linha branca anula a volta; 3º aviso = bandeira preta e branca; a partir do 4º, +5 s cada.
 
 ### Assistências (padrão ligadas; o teclado é tudo ou nada)
 - **Direção:** A/D pedem uma curvatura, limitada a 92% do que o pneu aguenta naquela velocidade. Volante todo nunca vira subesterço.
@@ -72,6 +87,9 @@ O script faz, nesta ordem:
 Aceite: excentricidade de roda abaixo de 15 mm no modelo leve e 10 mm no completo (medida com todos os vértices). Rodas são simplificadas com erro 5× menor que o chassi (`QA.checks()`), carro tocando o chão nas quatro rodas.
 
 ## 4. Pista e cenário
+
+- **Traçado real:** linha central da base TUMFTM racetrack-database (`SaoPaulo.csv`, LGPL-3.0), 4.306 m, 1 ponto a cada ~15 m. Altimetria aproximada por distância (`ELEV`). Curvas detectadas pela curvatura com os nomes reais. Nunca voltar a pontos desenhados à mão (o traçado antigo se cruzava).
+- **Nada a menos de HW+3 m de qualquer trecho:** `trackDist()` checa a pista inteira (grade de 40 m). `QA.scenery()` confere.
 
 - Asfalto, grama e brita com texturas PBR (cor, normal, rugosidade) da Poly Haven (CC0).
 - Céu e luz pelo HDRI. A direção do sol sai do pixel mais claro do HDRI.

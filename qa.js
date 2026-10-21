@@ -70,5 +70,17 @@
         const err = wrap(Math.atan2(tz - c.pos.z, tx - c.pos.x) - c.hd); set('KeyD', err > 0.02); set('KeyA', err < -0.02); set('KeyW', true) }
       D.step(D.DT); t += D.DT; if (Math.abs(c.latNow || 0) > 7) off += D.DT; if (c.lap !== lastLap) { laps.push(+(t - lapStart).toFixed(1)); lapStart = t; lastLap = c.lap } }
     ['KeyW', 'KeyA', 'KeyD'].forEach(k => set(k, false)); return { fora_s: +off.toFixed(1), dano: +c.dmg.toFixed(2), voltas: laps.slice(1) } }
-  window.QA = { checks, film, sim, kbBot };
+  /* nada do cenário dentro da pista: árvores e prédios (instâncias) a menos de HW+3 m de qualquer ponto do traçado */
+  function scenery() { const T = D.T; const out = []; const near = (x, z) => { let b = 1e9; for (let i = 0; i < T.N; i += 2) { const p = T.p[i]; const d = (p.x - x) ** 2 + (p.z - z) ** 2; if (d < b) b = d } return Math.sqrt(b) };
+    const HW = 7; const m = new THREE.Matrix4(), v = new THREE.Vector3();
+    D.scene.traverse(o => { if (!o.isInstancedMesh) return; let bad = 0, ex = null; for (let k = 0; k < o.count; k++) { o.getMatrixAt(k, m); v.setFromMatrixPosition(m); const d = near(v.x, v.z); if (d < HW + 3) { bad++; ex = ex || [Math.round(v.x), Math.round(v.z), +d.toFixed(1)] } } if (bad) out.push(`${o.geometry.type} x${o.count}: ${bad} na pista, ex ${ex}`) });
+    return { naPista: out } }
+  /* piloto automático no carro do jogador (corrida "neutra" para medir tráfego e colisões) */
+  function autopilot(level) { const R = race(); if (!R.player.ai) new D.AI(R.player, level || R.opt.diff || 1.06); return 'ok' }
+  /* corrida de teste: N segundos com todos pilotados pela IA; conta contatos, punições e asas quebradas */
+  function raceStats(secs = 240) { const R = race(); autopilot(); R.laps = 99; const log = []; D.onContact = (A, B, h) => { if (h.vn >= 2.2) log.push({ t: R.time, s: A.s }) };
+    for (let i = 0; i < Math.round(secs / D.DT); i++) D.step(D.DT); D.onContact = null; const all = R.cars; const b = all.map(c => c.best).filter(Boolean).sort((a, b) => a - b);
+    return { contatos: log.length, naLargada: log.filter(e => e.t < 15).length, punidos: all.filter(c => c.penalty).length, asas: all.filter(c => (c.wing || 0) > 0.2).length,
+      melhor: b[0] && +b[0].toFixed(1), mediana: b[Math.floor(b.length / 2)] && +b[Math.floor(b.length / 2)].toFixed(1), fora_s: +all.reduce((s, c) => s + c.offTrack, 0).toFixed(0) } }
+  window.QA = { checks, film, sim, kbBot, scenery, autopilot, raceStats };
 })();
