@@ -88,8 +88,8 @@ h1 span{color:var(--red)}
 .tyres .t{width:34px;height:40px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-weight:700;font-size:14px;color:#000}
 .tyres .cmp{grid-column:1/-1;display:flex;align-items:center;gap:8px;margin-top:4px}
 .cmp .ring{width:26px;height:26px;border-radius:50%;border:4px solid var(--cc);display:flex;align-items:center;justify-content:center;font-family:var(--display);font-weight:700;font-size:13px}
-.msg{position:absolute;left:50%;top:38%;transform:translate(-50%,-50%);text-align:center;font-family:var(--display);font-weight:700;font-size:clamp(28px,6vw,64px);letter-spacing:.06em;text-transform:uppercase;text-shadow:0 2px 20px rgba(0,0,0,.6)}
-.msg small{display:block;font-family:var(--ui);font-weight:600;font-size:14px;letter-spacing:.1em;color:var(--mut)}
+.msg{position:absolute;left:50%;top:96px;transform:translateX(-50%);text-align:center;font-family:var(--display);font-weight:700;font-size:clamp(18px,2.4vw,28px);letter-spacing:.06em;text-transform:uppercase;background:rgba(10,12,18,.82);border-left:4px solid var(--yellow);border-radius:4px;padding:6px 18px 7px;box-shadow:0 4px 18px rgba(0,0,0,.35)}   /* faixa de direção de prova: não cobre a pista */
+.msg small{display:block;font-family:var(--ui);font-weight:600;font-size:12px;letter-spacing:.1em;color:var(--mut)}
 .lights{position:absolute;left:50%;top:22%;transform:translateX(-50%);display:flex;gap:10px;background:#111;padding:10px;border-radius:8px;border:2px solid #333}
 .lights i{width:34px;height:34px;border-radius:50%;background:#2a0a0a;display:block;box-shadow:inset 0 0 6px #000}
 .lights i.on{background:var(--red);box-shadow:0 0 18px var(--red)}
@@ -122,7 +122,7 @@ tr.me td{background:rgba(255,255,255,.08)}
 @media (max-height:520px){.tower{width:128px;font-size:11px}.tower .r{grid-template-columns:18px 3px 30px 1fr;padding:1px 5px}.tower .r.far{display:none}.tower .hd{font-size:11px;padding:2px 6px}
   #map{width:96px;height:96px}.tyres{display:none}.timing{gap:10px;padding:3px 10px}.timing > div:nth-child(n+3){display:none}.timing .lap{font-size:16px}.timing .cur{font-size:18px;min-width:84px}.timing small{font-size:8px}.timing .sec i{width:18px;height:4px}
   .dash{gap:6px;padding:4px 12px 3px;background:rgba(10,12,18,.55)}.dash .col{display:none}.dash .gear{font-size:34px;width:30px}.dash .spd{font-size:28px;min-width:56px}.rpm i{width:7px;height:4px}.rpm{top:-7px}
-  .msg{transform:translate(-50%,-50%) scale(.55);top:30%}
+  .msg{top:calc(max(6px,env(safe-area-inset-top,0px)) + 82px);font-size:15px;padding:4px 12px}.msg small{font-size:10px}
   #touch button{width:68px;height:68px;font-size:16px}#touch .l,#touch .r,#touch .b,#touch .a{bottom:calc(16px + env(safe-area-inset-bottom,0px))}
   #touch .r{left:calc(max(14px,env(safe-area-inset-left,0px)) + 80px)}#touch .b{right:calc(max(14px,env(safe-area-inset-right,0px)) + 80px)}
   #touch .drs{bottom:calc(96px + env(safe-area-inset-bottom,0px));width:54px;height:54px;font-size:13px}#touch .cam{top:calc(116px + env(safe-area-inset-top,0px));width:54px;height:36px}}
@@ -745,14 +745,14 @@ function trackLimits(c){const out=Math.abs(c.latNow||0)>HW+CAR_HW+0.15&&c.v>8;if
 
 /* ======================= EFEITOS ======================= */
 /* faíscas do assoalho (prancha de titânio): compressões da pista, zebras e frenagem forte em alta */
-const sparks=(function(){const MAX=MOBILE?220:700;const geo=new THREE.BufferGeometry();const pos=new Float32Array(MAX*3),vel=new Float32Array(MAX*3),life=new Float32Array(MAX);
+const sparks=(function(){const MAX=MOBILE?220:700;const geo=new THREE.BufferGeometry();const pos=new Float32Array(MAX*3),vel=new Float32Array(MAX*3),life=new Float32Array(MAX),floor=new Float32Array(MAX);
   geo.setAttribute('position',new THREE.BufferAttribute(pos,3));geo.setAttribute('aLife',new THREE.BufferAttribute(life,1));
   const m=new THREE.ShaderMaterial({transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,
-    vertexShader:'attribute float aLife;varying float vL;void main(){vL=aLife;vec4 mv=modelViewMatrix*vec4(position,1.);gl_PointSize=max(1.5,(0.5+1.1*aLife)*70./max(1.,-mv.z));gl_Position=projectionMatrix*mv;}',
+    vertexShader:'attribute float aLife;varying float vL;void main(){vL=aLife;vec4 mv=modelViewMatrix*vec4(position,1.);gl_PointSize=max(1.2,(0.3+0.8*aLife)*50./max(1.,-mv.z));gl_Position=projectionMatrix*mv;}',
     fragmentShader:'varying float vL;void main(){if(vL<=0.)discard;vec2 c=gl_PointCoord-.5;float a=smoothstep(.5,.15,length(c));gl_FragColor=vec4(mix(vec3(1.,.38,.06),vec3(1.,.95,.75),vL*vL)*2.2,a*min(1.,vL*1.6));}'});
   const pts=new THREE.Points(geo,m);pts.frustumCulled=false;pts.userData.noMerge=true;scene.add(pts);let head=0,any=false;
-  return{spawn(p,v){const i=head;head=(head+1)%MAX;pos[i*3]=p.x;pos[i*3+1]=p.y;pos[i*3+2]=p.z;vel[i*3]=v.x;vel[i*3+1]=v.y;vel[i*3+2]=v.z;life[i]=1;any=true},
-    update(dt){if(!any)return;let alive=false;for(let i=0;i<MAX;i++){if(life[i]<=0)continue;alive=true;life[i]-=dt*2.4;vel[i*3+1]-=9.8*dt;const k=Math.exp(-dt*2.5);vel[i*3]*=k;vel[i*3+2]*=k;pos[i*3]+=vel[i*3]*dt;pos[i*3+1]+=vel[i*3+1]*dt;pos[i*3+2]+=vel[i*3+2]*dt}
+  return{spawn(p,v){const i=head;head=(head+1)%MAX;pos[i*3]=p.x;pos[i*3+1]=p.y;pos[i*3+2]=p.z;vel[i*3]=v.x;vel[i*3+1]=v.y;vel[i*3+2]=v.z;life[i]=1;floor[i]=p.y-0.03;any=true},
+    update(dt){if(!any)return;let alive=false;for(let i=0;i<MAX;i++){if(life[i]<=0)continue;alive=true;life[i]-=dt*3.4;vel[i*3+1]-=9.8*dt;const k=Math.exp(-dt*2.5);vel[i*3]*=k;vel[i*3+2]*=k;pos[i*3]+=vel[i*3]*dt;pos[i*3+1]+=vel[i*3+1]*dt;pos[i*3+2]+=vel[i*3+2]*dt;if(pos[i*3+1]<floor[i]){pos[i*3+1]=floor[i];vel[i*3+1]*=-0.3;life[i]-=0.15}}   /* quica no asfalto em vez de atravessar */
       geo.attributes.position.needsUpdate=true;geo.attributes.aLife.needsUpdate=true;any=alive}}})();
 const _sp=new THREE.Vector3(),_sv=new THREE.Vector3();
 const fx=(function(){const MAXP=600;const geo=new THREE.BufferGeometry();const pos=new Float32Array(MAXP*3),life=new Float32Array(MAXP),vel=new Float32Array(MAXP*3),size=new Float32Array(MAXP);

@@ -90,6 +90,7 @@ Aceite: excentricidade de roda abaixo de 15 mm no modelo leve e 10 mm no complet
 
 - Câmeras de bordo (T-cam, cockpit, bico) são presas à malha do carro com `localToWorld`, para o pneu nunca se mexer na tela.
 - Tremor só nas câmeras externas.
+- Avisos (`race.toast`) são uma faixa compacta de direção de prova logo abaixo do painel de tempo, nunca texto grande no meio da tela (cobre a pista).
 - T-cam: local (−0,15; 1,62; 0), olhando para (22; −0,1; 0), FOV 60.
 
 ## 5b. Carregamento no artifact (segurança restrita)
