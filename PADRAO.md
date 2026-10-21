@@ -26,6 +26,7 @@ Valores de referência de um F1 2025. Se uma mudança tirar algum destes da faix
 | IA Fácil / Médio / Difícil / Lendário | ~1:24 / ~1:19 / ~1:18 / ~1:17 (mediana) | `QA.raceStats()` |
 | Jogador com assistências (bot de teclado) | ~1:18 a 1:20, 0 s fora | `QA.kbBot()` |
 | Corrida neutra de 4 min | ~10 contatos (maioria na largada), ≤ 3 asas quebradas | `QA.raceStats()` |
+| Pit lane (entrada→saída, com parada) | 25 a 28 s | log "saiu do box" |
 
 Regras:
 - Carro e pneu iguais para todos; só `TEAMS[].pace` muda a aderência (diferença entre equipes). A dificuldade muda o quão perto do limite a IA pilota, nunca a aderência.
