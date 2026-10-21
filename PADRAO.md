@@ -20,11 +20,13 @@ Valores de referência de um F1 2025. Se uma mudança tirar algum destes da faix
 |---|---|---|
 | Pneu e aerodinâmica | atrito 2,0; ClA 5,0 m² (DRS −0,9); CdA 1,05 | constantes `MU0`, `CLA` |
 | Aceleração lateral | ~2,3 g a 100 km/h; ~5 g a 250 km/h | fórmula `MU0·(g + ½ρ·ClA·v²/m)` |
-| Frenagem 300 → 100 km/h | 1,3 a 1,6 s, 65 a 80 m, sem travar | `QA.checks()` |
-| Velocidade máxima | 320 a 340 km/h | perfil `VPROF` |
-| Volta ideal (perfil) | ~1:15 | soma `ds/VPROF` |
-| IA Fácil / Médio / Difícil / Lendário | ~1:24 / ~1:19 / ~1:18 / ~1:17 (mediana) | `QA.raceStats()` |
-| Jogador com assistências (bot de teclado) | ~1:18 a 1:20, 0 s fora | `QA.kbBot()` |
+| Frenagem 300 → 100 km/h | 1,3 a 1,7 s, 55 a 80 m, sem travar (na reta dos boxes) | `QA.checks()` |
+| Arrancada 0-100 / 0-200 / 0-300 | ~2,6 / ~4,7 / ~8,3 s (tração só no eixo traseiro, `REAR` 0,56) | cronometrar o líder na largada |
+| Velocidade máxima | 320 a 345 km/h (reta de 1,1 km de Sakhir) | telemetria da IA |
+| Volta ideal (perfil) | ~1:35 (pole real 2025: 1:29,8) | soma `ds/VPROF` |
+| IA Médio | melhor ~1:38, mediana ~1:41; 0 s fora | `QA.raceStats()` |
+| Pneus em ritmo | 95 a 110 °C (asfalto `TRACK_TEMP` 42 °C) | `temp` dos carros |
+| Jogador com assistências (bot de teclado) | ~1:42, 0 s fora sozinho | `QA.kbBot()` |
 | Corrida neutra de 4 min | ~10 contatos (maioria na largada), ≤ 3 asas quebradas | `QA.raceStats()` |
 | Pit lane (entrada→saída, com parada) | 25 a 28 s | log "saiu do box" |
 
@@ -74,7 +76,7 @@ Aceite: excentricidade de roda abaixo de 15 mm no modelo leve e 10 mm no complet
 
 ## 4. Pista e cenário
 
-- **Traçado real:** linha central da base TUMFTM racetrack-database (`SaoPaulo.csv`, LGPL-3.0), 4.306 m, 1 ponto a cada ~15 m. Altimetria aproximada por distância (`ELEV`). Curvas detectadas pela curvatura com os nomes reais. Nunca voltar a pontos desenhados à mão (o traçado antigo se cruzava).
+- **Traçado real:** linha central da base TUMFTM racetrack-database (`Sakhir.csv`, LGPL-3.0; Interlagos era `SaoPaulo.csv`), 5.404 m, 1 ponto a cada ~15 m. Altimetria aproximada por distância (`ELEV`). Curvas detectadas pela curvatura (`CORNER_NAMES` vazio = Curva 1, 2...). Lado dos boxes `PS` calculado: o de dentro do traçado. Nunca voltar a pontos desenhados à mão (o traçado antigo se cruzava).
 - **Nada a menos de HW+3 m de qualquer trecho:** `trackDist()` checa a pista inteira (grade de 40 m). `QA.scenery()` confere.
 
 - Asfalto, grama e brita com texturas PBR (cor, normal, rugosidade) da Poly Haven (CC0).
@@ -110,9 +112,11 @@ Aceite: excentricidade de roda abaixo de 15 mm no modelo leve e 10 mm no complet
 | Chamadas de desenho | ~300 | 31–50 |
 | Triângulos | ~3 milhões | 340–420 mil |
 
-## 5d. Cenário de Interlagos
-- Área interna: só grama, árvores e os dois lagos (gerados nos pontos mais distantes da pista dentro do traçado). Prédios só fora do traçado.
-- Grama com faixas de corte (9 m). Árvores em verde-oliva escuro (saturação baixa).
+## 5d. Cenário de Sakhir (Bahrein)
+- Deserto: chão de areia clara (textura `gravel` tingida), sem árvores nem lagos; construções baixas cor de areia espalhadas longe da pista; Torre de Sakhir atrás dos boxes.
+- Escape de asfalto (mais claro, grip 0,9) por fora das curvas; areia (grip 0,55) no resto até a mureta.
+- Por dentro de grampo fechado (T1) a linha da mureta cruzaria a saída: mureta, alambrado e postes somem onde ficariam a menos de HW+6 m de outro trecho.
+- Para trocar de pista: `RAW_XY`, `ELEV`, `CORNER_NAMES`, `S1/S2`, `DRS_ZONES`, `PIT`, arquibancadas, textos e `TRACK_TEMP`. O resto (perfil, IA, terreno, boxes) se ajusta sozinho.
 - Grid de largada pintado na mesma posição usada pelo `setup()`.
 - PC: gradação de cor de transmissão (contraste, saturação, sol quente, vinheta) depois da correção gamma.
 

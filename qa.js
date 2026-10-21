@@ -30,7 +30,7 @@
     out.rodaExcentricidade_mm = +(worst * 1000).toFixed(1);
     // 4. freio de referência: 300 -> 100 km/h (alvo real ~1,9 s / ~95 m)
     const c = R.cars.find(x => x.ai) || R.player; const snap = { s: c.s, ai: c.ai, v: c.v, lat: c.latNow || 0 };
-    c.ai = null; c.place(1500, 0); c.temp = [95, 95, 95, 95]; c.v = 300 / 3.6; c.gear = 8; let t = 0; const s0 = c.s;
+    c.ai = null; c.place(200, 0);   /* reta dos boxes */ c.temp = [95, 95, 95, 95]; c.v = 300 / 3.6; c.gear = 8; let t = 0; const s0 = c.s;
     while (c.v * 3.6 > 100 && t < 8) { c.brake = 1; c.throttle = 0; c.steer = 0; c.update(D.DT, null, R.opt, R); t += D.DT }
     out.freio300a100 = { s: +t.toFixed(2), m: Math.round(c.s - s0), travou: c.lock > 0.3 };
     c.ai = snap.ai; c.place(snap.s, snap.lat); c.v = snap.v;   /* volta na mesma velocidade: parado no meio do pelotão gerava batidas falsas */

@@ -1,5 +1,5 @@
 <meta charset="utf-8">
-<title>Grande Prêmio de São Paulo 2025</title>
+<title>Grande Prêmio do Bahrein 2025</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Titillium+Web:wght@400;600;700;900&family=Barlow+Condensed:wght@500;700&display=swap">
@@ -142,8 +142,8 @@ tr.me td{background:rgba(255,255,255,.08)}
 <div id="menu">
   <div class="wrap">
     <div class="eyebrow">Fórmula 1 · Temporada 2025 · Autódromo José Carlos Pace</div>
-    <h1>Grande Prêmio <span>de São Paulo</span></h1>
-    <p class="lead">Interlagos, 4.309 km, 15 curvas, sentido anti-horário. Grid completo de 2025, pneus Pirelli C3/C4/C5, DRS, ERS, desgaste, combustível e pit stop. Escolha o piloto e largue.</p>
+    <h1>Grande Prêmio <span>do Bahrein</span></h1>
+    <p class="lead">Sakhir, 5.412 km, 15 curvas, sentido horário. Grid completo de 2025, pneus Pirelli C3/C4/C5, DRS, ERS, desgaste, combustível e pit stop. Escolha o piloto e largue.</p>
     <div class="eyebrow">Piloto</div>
     <div class="grid" id="drivers"></div>
     <div class="opts">
@@ -239,12 +239,12 @@ const DRIVERS=[
   {n:'Nico Hülkenberg',c:'HUL',num:27,t:'SAU',sk:.985},{n:'Gabriel Bortoleto',c:'BOR',num:5,t:'SAU',sk:.983}];
 const COMPOUNDS={S:{n:'S',full:'Soft C5',mu:1.045,wear:1.0/14,col:'#ff2a2a',opt:100},M:{n:'M',full:'Medium C4',mu:1.0,wear:1.0/24,col:'#ffd400',opt:98},H:{n:'H',full:'Hard C3',mu:.965,wear:1.0/38,col:'#f2f2f2',opt:96}};
 
-/* ======================= PISTA (Interlagos) ======================= */
+/* ======================= PISTA (Bahrein, Sakhir) ======================= */
 const SC=1, HW=7;  // metros reais; meia-largura 7 m (pista de ~14 m)
-/* Traçado real de Interlagos: linha central da base TUMFTM racetrack-database (SaoPaulo.csv, LGPL-3.0), 1 ponto a cada ~15 m.
-   Coordenadas do jogo: x = x, z = -y. Altimetria aproximada por distância (largada no alto, mínimo na Descida do Lago). */
-const RAW_XY=[[-0.5,0.5],[3.3,15.0],[7.0,29.6],[10.6,44.1],[14.4,58.6],[18.4,73.1],[22.4,87.5],[26.4,101.9],[30.4,116.4],[34.3,130.9],[38.2,145.3],[42.2,159.8],[46.1,174.3],[50.1,188.7],[54.1,203.2],[58.0,217.6],[62.0,232.1],[65.9,246.6],[69.9,261.1],[74.4,275.3],[80.3,289.0],[88.4,301.7],[97.7,313.4],[110.0,321.4],[124.7,324.9],[139.4,324.1],[151.0,315.0],[161.2,303.8],[171.4,292.9],[182.2,282.5],[195.0,275.0],[209.7,272.5],[223.6,277.2],[236.4,285.0],[249.5,292.2],[263.2,298.4],[277.3,303.3],[291.9,306.9],[306.7,309.1],[321.7,309.7],[336.6,308.6],[351.3,305.9],[365.6,301.4],[379.2,295.1],[391.8,287.1],[403.6,277.9],[414.4,267.4],[423.7,255.8],[431.8,243.1],[438.9,229.9],[444.8,216.2],[448.9,201.8],[453.0,187.3],[457.3,173.0],[461.9,158.7],[465.7,144.2],[469.1,129.6],[472.5,115.0],[476.1,100.4],[479.7,85.9],[483.4,71.4],[487.1,56.8],[490.9,42.3],[494.7,27.8],[498.4,13.3],[502.2,-1.2],[505.9,-15.7],[509.7,-30.3],[513.4,-44.8],[517.1,-59.3],[520.8,-73.8],[524.5,-88.4],[528.2,-102.9],[531.9,-117.4],[535.7,-131.9],[539.4,-146.5],[543.1,-161.0],[546.9,-175.5],[550.6,-190.0],[554.4,-204.5],[558.1,-219.1],[561.9,-233.6],[565.7,-248.1],[569.4,-262.6],[573.2,-277.1],[577.0,-291.6],[580.8,-306.1],[584.6,-320.6],[588.3,-335.1],[592.1,-349.6],[595.8,-364.2],[599.5,-378.7],[602.9,-393.3],[603.6,-408.1],[601.2,-423.1],[594.7,-436.4],[583.2,-445.7],[569.4,-451.2],[554.7,-454.5],[539.9,-457.2],[525.2,-459.5],[510.3,-461.7],[495.4,-463.2],[480.4,-463.9],[465.5,-463.4],[450.8,-460.7],[436.8,-455.4],[422.7,-450.4],[408.8,-444.8],[396.3,-436.6],[384.5,-427.3],[374.0,-416.7],[364.9,-404.8],[356.2,-392.6],[347.8,-380.2],[339.4,-367.7],[331.1,-355.3],[322.7,-342.8],[314.4,-330.4],[305.9,-318.0],[297.4,-305.6],[288.8,-293.3],[280.2,-281.1],[271.5,-268.8],[262.8,-256.6],[254.1,-244.5],[245.3,-232.3],[236.5,-220.1],[227.7,-208.0],[218.9,-195.8],[210.1,-183.7],[201.2,-171.6],[192.4,-159.6],[183.1,-147.8],[172.8,-136.9],[161.1,-127.5],[147.5,-122.2],[132.6,-121.0],[117.5,-121.0],[102.6,-122.4],[88.0,-125.6],[74.1,-131.0],[60.9,-138.2],[48.0,-145.9],[36.3,-155.1],[26.8,-166.8],[20.4,-180.2],[15.3,-194.3],[11.5,-208.8],[8.9,-223.5],[6.5,-238.3],[3.8,-253.1],[1.3,-267.9],[-0.4,-282.8],[-0.8,-297.8],[1.8,-312.2],[12.0,-322.8],[25.8,-328.8],[40.5,-328.5],[53.9,-322.2],[66.0,-313.5],[78.5,-305.0],[92.4,-299.3],[107.0,-297.9],[121.2,-302.3],[131.9,-312.6],[138.4,-326.0],[141.1,-340.7],[139.6,-355.6],[134.3,-369.6],[125.7,-381.8],[115.0,-392.3],[104.2,-402.6],[93.4,-413.1],[82.8,-423.7],[72.8,-434.8],[63.4,-446.5],[55.1,-459.0],[48.6,-472.4],[44.3,-486.8],[40.7,-501.4],[37.1,-515.9],[33.8,-530.6],[35.5,-545.1],[46.2,-554.9],[60.2,-560.9],[74.3,-560.2],[84.8,-549.5],[94.6,-538.1],[104.5,-526.9],[114.3,-515.8],[124.2,-504.4],[134.3,-493.2],[145.1,-482.7],[156.9,-473.6],[169.8,-466.4],[184.0,-461.2],[198.7,-458.0],[213.6,-456.7],[228.5,-457.2],[243.3,-459.4],[257.8,-463.4],[270.9,-470.4],[282.3,-480.2],[292.0,-491.6],[300.6,-503.8],[308.6,-516.5],[316.5,-529.3],[324.3,-542.1],[332.1,-554.9],[339.8,-567.7],[347.6,-580.5],[355.4,-593.4],[363.0,-606.2],[370.7,-619.1],[378.2,-632.1],[384.9,-645.5],[388.4,-659.9],[386.1,-674.7],[376.8,-685.9],[363.7,-693.0],[349.6,-698.3],[335.4,-703.2],[321.4,-708.3],[307.3,-713.5],[293.1,-718.5],[278.6,-721.8],[263.7,-722.1],[248.8,-720.0],[234.1,-717.1],[219.4,-714.3],[204.6,-711.8],[189.8,-709.3],[175.2,-705.8],[161.1,-701.0],[147.1,-695.5],[133.3,-689.7],[119.7,-683.5],[106.2,-676.8],[93.0,-669.7],[80.1,-662.1],[67.6,-653.9],[55.5,-645.1],[43.9,-635.5],[33.1,-625.2],[23.3,-613.8],[15.4,-601.1],[8.4,-587.9],[2.1,-574.2],[-2.8,-560.1],[-6.6,-545.6],[-10.1,-531.0],[-13.6,-516.5],[-17.2,-501.9],[-20.5,-487.3],[-23.8,-472.7],[-27.0,-458.0],[-30.1,-443.3],[-33.3,-428.7],[-36.4,-414.0],[-39.6,-399.4],[-42.9,-384.7],[-46.3,-370.1],[-49.8,-355.6],[-53.2,-341.0],[-56.2,-326.3],[-58.7,-311.6],[-60.6,-296.7],[-61.7,-281.7],[-62.1,-266.7],[-61.6,-251.7],[-60.3,-236.8],[-58.1,-222.0],[-55.2,-207.3],[-51.8,-192.7],[-48.2,-178.1],[-44.5,-163.6],[-40.8,-149.1],[-37.1,-134.5],[-33.4,-120.0],[-29.5,-105.5],[-25.6,-91.1],[-21.7,-76.6],[-17.7,-62.2],[-13.7,-47.7],[-9.7,-33.3],[-5.7,-18.8],[-1.8,-4.3]];
-const ELEV=[[0,38],[200,37],[400,34],[550,26],[700,20],[900,14],[1200,8],[1400,5],[1550,4],[1800,7],[2000,10],[2200,15],[2400,17],[2600,16],[2800,13],[3000,9],[3200,8],[3400,9],[3600,10],[3800,16],[4000,24],[4200,33],[4310,38]];
+/* Traçado real do Circuito Internacional do Bahrein (Sakhir, 5.412 km, horário): linha central da base TUMFTM racetrack-database (Sakhir.csv, LGPL-3.0), 1 ponto a cada ~15 m.
+   Coordenadas do jogo: x = x, z = -y. Altimetria aproximada por distância (deserto quase plano: mínimo na T1, máximo na T8, ~13 m de variação). */
+const RAW_XY=[[-1.4,-1.6],[-0.8,13.4],[-0.1,28.4],[0.6,43.4],[1.3,58.4],[2.0,73.4],[2.6,88.4],[3.3,103.3],[4.0,118.3],[4.7,133.3],[5.4,148.3],[6.0,163.3],[6.7,178.3],[7.4,193.3],[8.1,208.2],[8.7,223.2],[9.4,238.2],[10.1,253.2],[10.8,268.2],[11.4,283.2],[12.1,298.2],[12.8,313.1],[13.5,328.1],[14.2,343.1],[14.9,358.1],[15.5,373.1],[16.2,388.1],[16.9,403.1],[17.6,418.0],[18.3,433.0],[19.0,448.0],[19.7,463.0],[20.4,478.0],[21.0,493.0],[21.7,508.0],[22.4,522.9],[23.0,537.9],[23.7,552.9],[24.3,567.9],[24.9,582.9],[25.5,597.9],[26.1,612.9],[26.6,627.9],[27.2,642.9],[27.7,657.9],[28.3,672.8],[28.9,687.8],[29.3,702.8],[29.8,717.8],[34.2,731.7],[48.3,733.4],[59.8,724.3],[70.4,713.5],[81.3,703.2],[92.0,692.8],[102.6,682.1],[115.2,674.2],[129.8,675.3],[144.2,679.7],[158.4,684.4],[172.7,689.0],[187.0,693.4],[201.2,698.2],[215.6,702.5],[230.3,704.7],[245.2,703.7],[260.1,701.3],[274.8,698.6],[289.6,695.7],[304.3,692.7],[319.0,689.8],[333.7,686.9],[348.4,684.0],[363.1,681.1],[377.8,678.2],[392.6,675.3],[407.3,672.4],[422.0,669.5],[436.7,666.6],[451.4,663.7],[466.2,660.8],[480.9,657.9],[495.6,655.0],[510.3,652.1],[525.0,649.2],[539.7,646.3],[554.5,643.4],[569.2,640.5],[583.9,637.6],[598.6,634.7],[613.3,631.8],[628.0,628.9],[642.8,626.0],[657.5,623.1],[672.2,620.2],[686.9,617.3],[701.6,614.4],[716.4,611.5],[731.1,608.6],[745.8,605.7],[760.5,602.7],[775.2,599.9],[788.3,593.6],[792.6,579.4],[792.4,564.6],[790.1,549.8],[783.3,537.0],[771.6,527.6],[760.0,518.0],[748.4,508.6],[736.7,499.1],[725.1,489.6],[713.5,480.1],[701.9,470.6],[690.4,461.0],[679.0,451.2],[668.0,441.0],[657.5,430.4],[647.2,419.4],[637.1,408.3],[627.3,396.9],[619.0,384.6],[612.1,371.3],[606.0,357.5],[600.1,343.7],[593.7,330.3],[583.3,319.6],[570.2,312.7],[555.7,309.5],[540.6,309.2],[525.8,310.6],[510.9,312.4],[496.0,314.5],[481.0,315.8],[466.3,314.2],[452.0,309.6],[439.1,302.0],[428.2,292.0],[418.5,280.6],[409.2,268.7],[399.9,257.0],[390.6,245.2],[381.3,233.5],[372.0,221.7],[362.7,209.9],[353.4,198.1],[344.1,186.4],[334.8,174.6],[325.5,162.9],[316.2,151.0],[306.0,140.1],[291.7,138.3],[277.4,142.2],[268.3,152.9],[267.4,167.8],[269.4,182.7],[272.0,197.4],[274.4,212.2],[276.7,227.0],[279.1,241.9],[281.4,256.7],[283.8,271.5],[286.2,286.3],[288.6,301.1],[291.0,315.9],[293.4,330.7],[295.7,345.5],[298.1,360.4],[300.5,375.2],[302.9,390.0],[305.2,404.8],[307.6,419.6],[309.8,434.4],[311.9,449.3],[312.6,464.2],[310.7,479.1],[307.3,493.7],[301.9,507.6],[293.7,520.1],[283.4,531.0],[272.0,540.7],[260.4,550.2],[247.4,557.2],[235.4,550.1],[232.1,535.7],[230.0,520.9],[227.9,506.0],[226.0,491.1],[224.1,476.2],[222.1,461.4],[220.0,446.5],[217.8,431.6],[215.8,416.8],[214.3,401.9],[213.2,386.9],[212.3,372.0],[211.5,357.0],[210.8,342.0],[210.2,327.0],[209.5,312.0],[208.8,297.0],[208.2,282.0],[207.5,267.0],[206.8,252.1],[206.1,237.1],[205.4,222.1],[204.7,207.1],[204.1,192.1],[203.4,177.1],[202.7,162.2],[202.1,147.2],[201.4,132.2],[200.8,117.2],[200.1,102.2],[199.5,87.2],[198.9,72.2],[198.2,57.2],[197.6,42.2],[197.0,27.3],[196.3,12.3],[195.7,-2.7],[195.0,-17.7],[194.3,-32.7],[193.7,-47.7],[193.0,-62.7],[192.4,-77.7],[191.8,-92.7],[191.1,-107.7],[190.4,-122.4],[190.0,-137.8],[193.5,-151.7],[206.3,-159.4],[220.3,-164.4],[235.0,-167.0],[250.0,-167.6],[265.0,-166.8],[279.8,-164.7],[294.4,-161.2],[308.5,-156.2],[322.0,-149.6],[334.3,-141.4],[345.5,-131.4],[355.4,-120.0],[364.0,-107.8],[371.5,-94.9],[377.9,-81.3],[383.5,-67.4],[389.1,-53.4],[394.5,-39.5],[399.7,-25.4],[405.4,-11.5],[413.0,1.3],[422.8,12.7],[433.4,23.3],[444.8,33.0],[457.1,41.6],[470.3,48.6],[484.4,53.6],[499.2,56.2],[514.2,57.1],[529.0,56.2],[543.8,53.2],[558.3,49.7],[572.1,43.8],[585.6,37.4],[599.1,30.9],[612.6,24.3],[626.1,17.8],[639.7,11.3],[653.3,5.0],[666.6,-1.9],[678.4,-10.9],[687.3,-22.9],[695.0,-35.8],[702.2,-48.9],[707.0,-63.1],[707.1,-78.0],[701.3,-91.4],[690.8,-102.2],[678.9,-111.4],[666.2,-119.3],[653.1,-126.4],[639.6,-133.1],[626.2,-139.9],[613.0,-146.9],[599.8,-154.1],[586.7,-161.3],[573.6,-168.7],[560.5,-176.0],[547.4,-183.4],[534.4,-190.7],[521.3,-198.1],[508.2,-205.4],[495.1,-212.7],[482.0,-220.0],[468.9,-227.3],[455.7,-234.6],[442.6,-241.9],[429.5,-249.1],[416.4,-256.4],[403.3,-263.7],[390.2,-271.1],[377.1,-278.4],[364.0,-285.7],[350.9,-293.0],[337.8,-300.3],[324.7,-307.7],[311.6,-315.0],[298.5,-322.3],[285.4,-329.6],[272.3,-336.9],[259.2,-344.2],[246.1,-351.4],[233.0,-358.7],[219.9,-366.0],[206.8,-373.4],[193.7,-380.7],[180.7,-388.1],[167.6,-395.6],[154.6,-403.0],[141.5,-410.3],[128.4,-417.6],[115.2,-424.8],[102.0,-431.9],[88.7,-438.8],[75.4,-445.8],[62.1,-452.6],[48.8,-459.4],[35.6,-466.8],[21.2,-466.5],[10.9,-456.3],[5.1,-442.5],[-0.6,-428.6],[-6.3,-414.8],[-12.2,-400.8],[-15.2,-386.3],[-15.4,-371.3],[-15.0,-356.3],[-14.5,-341.3],[-14.0,-326.3],[-13.6,-311.3],[-13.2,-296.4],[-12.8,-281.4],[-12.4,-266.4],[-12.0,-251.4],[-11.5,-236.4],[-11.0,-221.4],[-10.5,-206.4],[-9.9,-191.4],[-9.3,-176.4],[-8.7,-161.4],[-8.1,-146.4],[-7.4,-131.4],[-6.7,-116.5],[-6.0,-101.5],[-5.3,-86.5],[-4.6,-71.5],[-4.0,-56.5],[-3.3,-41.5],[-2.6,-26.5],[-1.9,-11.6]];
+const ELEV=[[0,6],[600,5],[750,4],[1000,6],[1500,11],[1700,13],[2000,15],[2250,17],[2500,16],[2780,15],[3000,13],[3400,11],[3700,10],[4200,9],[4600,7],[5000,6],[5420,6]];
 const elevAt=s=>{for(let k=1;k<ELEV.length;k++)if(s<=ELEV[k][0]){const[a,ya]=ELEV[k-1],[b,yb]=ELEV[k];const t=(s-a)/(b-a);return ya+(yb-ya)*(t*t*(3-2*t))}return ELEV[ELEV.length-1][1]};
 const RAW=(()=>{let s=0;return RAW_XY.map((p,i)=>{if(i)s+=Math.hypot(p[0]-RAW_XY[i-1][0],p[1]-RAW_XY[i-1][1]);return[p[0],p[1],elevAt(s)]})})();
 const curve=new THREE.CatmullRomCurve3(RAW.map(p=>new THREE.Vector3(p[0]*SC,p[2],p[1]*SC)),true,'centripetal');
@@ -268,14 +268,15 @@ const RL=Kwide.map(k=>clamp(k/kMax*HW*0.62,-HW*.62,HW*.62)); // offset lateral d
 const idxAt=s=>((Math.round(s/T.ds)%N)+N)%N;
 /* curvatura da trajetória que o carro realmente segue (linha de corrida RL), medida em ±8 amostras (~15 m): é o que o carro consegue cumprir */
 const KLINE=(()=>{const P=T.p.map((p,i)=>({x:p.x+T.n[i].x*RL[i],z:p.z+T.n[i].z*RL[i]}));const w=8,k=new Array(N);for(let i=0;i<N;i++){const a=P[(i-w+N)%N],b=P[i],c=P[(i+w)%N];let d=Math.atan2(c.z-b.z,c.x-b.x)-Math.atan2(b.z-a.z,b.x-a.x);while(d>Math.PI)d-=2*Math.PI;while(d<-Math.PI)d+=2*Math.PI;k[i]=d/((Math.hypot(b.x-a.x,b.z-a.z)+Math.hypot(c.x-b.x,c.z-b.z))/2)}return k})();
-const CORNER_NAMES=['T1 S do Senna','T2 S do Senna','T3 Curva do Sol','T4 Descida do Lago','T5','T6 Ferradura','T7 Ferradura','T8 Laranjinha','T9 Pinheirinho','T10 Bico de Pato','T11 Mergulho','T12 Junção','T13','T14 Subida dos Boxes','T15 Arquibancadas'];
+const CORNER_NAMES=[];   /* Sakhir não tem nomes oficiais: Curva 1, 2... */
 const CORNERS=(()=>{const W=Math.round(70/T.ds),pk=[];for(let i=0;i<N;i++){const a=Math.abs(Ksm[i]);if(a<0.011)continue;let mx=true;for(let j=-W;j<=W;j++)if(Math.abs(Ksm[(i+j+N)%N])>a){mx=false;break}if(mx&&(!pk.length||(i-pk[pk.length-1])*T.ds>90))pk.push(i)}
   return pk.map((i,k)=>[i*T.ds,CORNER_NAMES[k]||('Curva '+(k+1))])})();
-const S1=0.26*T.L,S2=0.70*T.L;
-const DRS_ZONES=[{det:430,from:720,to:1300},{det:3560,from:3990,to:T.L+230}];   /* Reta Oposta e reta dos boxes */
+const S1=0.305*T.L,S2=0.74*T.L;
+const DRS_ZONES=[{det:600,from:1000,to:1450},{det:2650,from:2900,to:3300},{det:4850,from:5150,to:T.L+520}];   /* T3->T4, T10->T11 e reta dos boxes (3 zonas, como em 2025) */
+const PS=(()=>{const q=[];for(let i=0;i<N;i+=8)q.push(T.p[i]);const p=T.p[idxAt(150)],n=T.n[idxAt(150)];const x=p.x+n.x*40,z=p.z+n.z*40;let c=false;for(let i=0,j=q.length-1;i<q.length;j=i++){const a=q[i],b=q[j];if(((a.z>z)!==(b.z>z))&&(x<(b.x-a.x)*(z-a.z)/(b.z-a.z)+a.x))c=!c}return c?1:-1})();   /* lado dos boxes (sinal em n): o de dentro do traçado */
 const PIT={entry:T.L-300,exit:230};   /* ~530 m de pit lane: ~26 s com a parada (real ~25-28 s) */
 /* pit lane: acompanha a reta dos boxes pelo lado dos boxes (-n), afastando 3 -> 15 m na entrada e voltando na saída */
-const pitPts=(()=>{const out=[];const s0=PIT.entry,s1=T.L+PIT.exit;for(let s=s0;s<=s1;s+=20){const r=Math.min(1,(s-s0)/140,(s1-s)/160);const lat=-(HW+3+12*(r*r*(3-2*r)));const i=idxAt(s);const p=T.p[i],n=T.n[i];out.push(new THREE.Vector3(p.x+n.x*lat,0,p.z+n.z*lat))}return out})();
+const pitPts=(()=>{const out=[];const s0=PIT.entry,s1=T.L+PIT.exit;for(let s=s0;s<=s1;s+=20){const r=Math.min(1,(s-s0)/140,(s1-s)/160);const lat=PS*(HW+3+12*(r*r*(3-2*r)));const i=idxAt(s);const p=T.p[i],n=T.n[i];out.push(new THREE.Vector3(p.x+n.x*lat,0,p.z+n.z*lat))}return out})();
 const pitCurve=new THREE.CatmullRomCurve3(pitPts,false,'catmullrom',.5); pitCurve.arcLengthDivisions=800;
 const pitLen=pitCurve.getLength(); const pitBoxU=i=>0.50-i*0.028;
 const yAtXZ=(x,z,i)=>{ // altura do terreno pela amostra mais próxima
@@ -302,7 +303,7 @@ const skyDome=new THREE.Mesh(new THREE.SphereGeometry(5200,40,20),skyMat);skyDom
 (function env(){const c=document.createElement('canvas');c.width=512;c.height=256;const x=c.getContext('2d');const g=x.createLinearGradient(0,0,0,256);g.addColorStop(0,'#2b63c9');g.addColorStop(.45,'#86b3ee');g.addColorStop(.52,'#dbe6f2');g.addColorStop(.56,'#6f8f5a');g.addColorStop(1,'#2e4a22');x.fillStyle=g;x.fillRect(0,0,512,256);
   const r=x.createRadialGradient(150,95,2,150,95,40);r.addColorStop(0,'rgba(255,250,230,1)');r.addColorStop(.15,'rgba(255,245,220,.9)');r.addColorStop(1,'rgba(255,245,220,0)');x.fillStyle=r;x.fillRect(0,0,512,256);
   const t=new THREE.CanvasTexture(c);t.mapping=THREE.EquirectangularReflectionMapping;t.encoding=THREE.sRGBEncoding;const pm=new THREE.PMREMGenerator(renderer);pm.compileEquirectangularShader();scene.environment=pm.fromEquirectangular(t).texture;pm.dispose();t.dispose()})();
-const hemi=new THREE.HemisphereLight(0xe3edff,0x2c4a22,0.65);scene.add(hemi);
+const hemi=new THREE.HemisphereLight(0xe3edff,0x9a7d55,0.65);   /* luz rebatida da areia */scene.add(hemi);
 const sun=new THREE.DirectionalLight(0xfff2de,1.7);sun.position.copy(SUNDIR).multiplyScalar(500);sun.castShadow=true;
 sun.shadow.mapSize.setScalar(MOBILE?1024:4096);sun.shadow.camera.near=100;sun.shadow.camera.far=1100;const SH=80;
 sun.shadow.camera.left=-SH;sun.shadow.camera.right=SH;sun.shadow.camera.top=SH;sun.shadow.camera.bottom=-SH;sun.shadow.bias=-0.0005;sun.shadow.normalBias=0.04;
@@ -344,7 +345,7 @@ function tvSpots(){const out=[];for(const [cs] of CORNERS){const bi=idxAt(cs);co
 /* campo de visão das câmeras de TV livre: nada de árvore a menos de 70 m da câmera nem perto da linha câmera->trecho filmado */
 function blocksTV(x,z){if(!blocksTV.sp)blocksTV.sp=tvSpots();for(const c of blocksTV.sp){const d=Math.hypot(x-c.x,z-c.z);if(d<70)return true;
   for(const ds of[0,30,60,90,120]){const i=idxAt(c.s+ds);const p=T.p[i];const vx=p.x-c.x,vz=p.z-c.z,L=Math.hypot(vx,vz)||1;const t=((x-c.x)*vx+(z-c.z)*vz)/L;if(t>0&&t<L&&Math.abs((x-c.x)*vz-(z-c.z)*vx)/L<14)return true}}return false}
-function nearPits(x,z){for(let s=T.L-480;s<=T.L+60;s+=25){const f=frameAt(((s%T.L)+T.L)%T.L,-(HW+30));if(Math.hypot(f.x-x,f.z-z)<48)return true}return false}
+function nearPits(x,z){for(let s=T.L-480;s<=T.L+60;s+=25){const f=frameAt(((s%T.L)+T.L)%T.L,PS*(HW+30));if(Math.hypot(f.x-x,f.z-z)<48)return true}return false}
 function trackDist(x,z,maxR){const C=TGRID.C,R=Math.ceil((maxR||200)/C);const cx=Math.floor(x/C),cz=Math.floor(z/C);let best=1e9;
   for(let a=-R;a<=R;a++)for(let b=-R;b<=R;b++){const l=TGRID.g.get((cx+a)+','+(cz+b));if(!l)continue;for(const i of l){const p=T.p[i];const d=(p.x-x)*(p.x-x)+(p.z-z)*(p.z-z);if(d<best)best=d}}return Math.sqrt(best)}
 function ribbon(offA,offB,colorFn,yOff,opts){opts=opts||{};const pos=[],col=[],uv=[],idx=[];
@@ -364,10 +365,11 @@ for(const s of[-1,1]){ribbon(i=>s*HW,i=>s*(HW+(hasKerb(i)?1.7:0)),kerbC,0.0,{yB:
   ribbon(i=>s*(HW+(hasKerb(i)?1.7:0)),i=>s*(HW+(hasKerb(i)?2.3:0)),kerbC,0.0,{yA:i=>hasKerb(i)?0.06:0,recv:false});}
 const rub=ribbon(i=>RL[i]-1.3,i=>RL[i]+1.3,()=>new THREE.Color(0.03,0.03,0.035),0.006,{recv:true,mat:{transparent:true,opacity:.38,envMapIntensity:0,roughness:1,depthWrite:false}});void rub;
 const rlMesh=ribbon(i=>RL[i]-0.16,i=>RL[i]+0.16,()=>new THREE.Color(0.2,0.95,0.45),0.03,{recv:false,mat:{transparent:true,opacity:.62,depthWrite:false,envMapIntensity:0,roughness:1}});rlMesh.visible=false;rlMesh.userData.noMerge=true;
-// escape: brita no lado de fora das curvas, grama no resto
+// escape: asfalto (mais claro, sem borracha) no lado de fora das curvas, como em Sakhir; areia no resto até a mureta
+const RUNOFF_ASF=new THREE.Color(1.35,1.32,1.28);
 for(const s of[-1,1]){
-  ribbon(i=>s*(HW+2.3),i=>s*(HW+(isRunoff(i)&&outsideOf(i)===s?12.5:2.31)),()=>WHITE,-0.01,{mat:gravelPBR,vLen:4,uRep:3});
-  ribbon(i=>s*(HW+(isRunoff(i)&&outsideOf(i)===s?12.5:2.3)),i=>s*(HW+15.2),i=>{const c=MOW[Math.floor(i*T.ds/9)%2].clone();const v=0.93+0.07*Math.sin(i*0.37)*Math.sin(i*0.113+1.7);return c.multiplyScalar(v).lerp(new THREE.Color(.86,.83,.62),0.08+0.08*Math.max(0,Math.sin(i*0.051)))},-0.02,{mat:grassPBR,vLen:5,uRep:4});}
+  ribbon(i=>s*(HW+2.3),i=>s*(HW+(isRunoff(i)&&outsideOf(i)===s?12.5:2.31)),()=>RUNOFF_ASF,-0.008,{mat:asphaltPBR,vLen:3.5,uRep:3});
+  ribbon(i=>s*(HW+(isRunoff(i)&&outsideOf(i)===s?12.5:2.3)),i=>s*(HW+15.2),i=>{const v=0.92+0.08*Math.sin(i*0.37)*Math.sin(i*0.113+1.7);return new THREE.Color(1,.95,.86).multiplyScalar(v)},-0.02,{mat:gravelPBR,vLen:5,uRep:4});}
 // barreiras: TecPro/pneus nas curvas, concreto nas retas; alambrado acima
 /* muretas reais: concreto pintado nas retas, barreira TecPro (blocos vermelho/branco) nas áreas de escape; alambrado com postes */
 const wallTex=canvasTex(256,64,(x,w,h)=>{const g=x.createLinearGradient(0,0,0,h);g.addColorStop(0,'#f1f2f2');g.addColorStop(.12,'#e4e6e7');g.addColorStop(.8,'#c9ccce');g.addColorStop(1,'#8d8f90');x.fillStyle=g;x.fillRect(0,0,w,h);
@@ -378,30 +380,33 @@ const tecTex=canvasTex(256,64,(x,w,h)=>{for(let b=0;b<2;b++){const x0=b*w/2;x.fi
 (function barriers(){const wallM=new THREE.MeshStandardMaterial({map:wallTex,roughness:.9,side:THREE.DoubleSide}),tecM=new THREE.MeshStandardMaterial({map:tecTex,roughness:.7,side:THREE.DoubleSide});
   const posts=[];
   for(const side of[-1,1]){const off=side*(HW+14.6);
+    /* por dentro de grampo fechado (T1 de Sakhir) a linha da mureta cruza a saída da curva: ali não tem mureta */
+    const WOK=new Array(N);for(let j=0;j<N;j++){const p=T.p[j],n=T.n[j];WOK[j]=trackDist(p.x+n.x*off,p.z+n.z*off,40)>HW+6}
     /* duas faixas: concreto (some nas áreas de escape) e TecPro (só nelas) — altura zero onde não se aplica */
-    for(const kind of['wall','tec']){const pos=[],uv=[],idx=[];for(let i=0;i<=N;i++){const j=i%N,p=T.p[j],n=T.n[j];const run=isRunoff(j);const on=kind==='tec'?run:!run;const top=on?(kind==='tec'?1.05:1.15):-0.2;
+    for(const kind of['wall','tec']){const pos=[],uv=[],idx=[];for(let i=0;i<=N;i++){const j=i%N,p=T.p[j],n=T.n[j];const run=isRunoff(j);const on=(kind==='tec'?run:!run)&&WOK[j];const top=on?(kind==='tec'?1.05:1.15):-0.2;
         pos.push(p.x+n.x*off,p.y-0.2,p.z+n.z*off,p.x+n.x*off,p.y+top,p.z+n.z*off);const u=i*T.ds/(kind==='tec'?2.0:4.0);uv.push(u,0,u,1);if(i<N){const k=i*2;idx.push(k,k+1,k+2,k+1,k+3,k+2)}}
       const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));g.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));g.setIndex(idx);g.computeVertexNormals();
       const m=new THREE.Mesh(g,kind==='tec'?tecM:wallM);m.receiveShadow=true;scene.add(m)}
-    const fp=[],fu=[],fi=[];for(let i=0;i<=N;i++){const j=i%N,p=T.p[j],n=T.n[j];fp.push(p.x+n.x*off,p.y+1.15,p.z+n.z*off,p.x+n.x*off,p.y+4.2,p.z+n.z*off);const vv=i*T.ds/3;fu.push(vv,0,vv,1);if(i<N){const k=i*2;fi.push(k,k+1,k+2,k+1,k+3,k+2)}}
+    const fp=[],fu=[],fi=[];for(let i=0;i<=N;i++){const j=i%N,p=T.p[j],n=T.n[j];fp.push(p.x+n.x*off,p.y+1.15,p.z+n.z*off,p.x+n.x*off,p.y+(WOK[j]?4.2:1.15),p.z+n.z*off);const vv=i*T.ds/3;fu.push(vv,0,vv,1);if(i<N){const k=i*2;fi.push(k,k+1,k+2,k+1,k+3,k+2)}}
     const fg=new THREE.BufferGeometry();fg.setAttribute('position',new THREE.Float32BufferAttribute(fp,3));fg.setAttribute('uv',new THREE.Float32BufferAttribute(fu,2));fg.setIndex(fi);
     scene.add(new THREE.Mesh(fg,new THREE.MeshBasicMaterial({map:fenceTex,transparent:true,side:THREE.DoubleSide,depthWrite:false})));
-    const step=MOBILE?9:4.5;for(let s=0;s<T.L;s+=step){const i=idxAt(s),p=T.p[i],n=T.n[i];posts.push([p.x+n.x*(off+side*0.15),p.y+2.7,p.z+n.z*(off+side*0.15)])}}
+    const step=MOBILE?9:4.5;for(let s=0;s<T.L;s+=step){const i=idxAt(s),p=T.p[i],n=T.n[i];if(!WOK[i])continue;posts.push([p.x+n.x*(off+side*0.15),p.y+2.7,p.z+n.z*(off+side*0.15)])}}
   /* postes do alambrado (instanciados) */
   const pg=new THREE.CylinderGeometry(.045,.045,3.1,5);const pm=new THREE.MeshStandardMaterial({color:srgb('#5d6166'),roughness:.5,metalness:.6});const pim=new THREE.InstancedMesh(pg,pm,posts.length);const o=new THREE.Object3D();
   posts.forEach((q,k)=>{o.position.set(q[0],q[1],q[2]);o.updateMatrix();pim.setMatrixAt(k,o.matrix)});scene.add(pim)})();
 // terreno acompanhando a elevação da pista (sem penhascos) + colinas distantes
+const TC=(()=>{let a=1e9,b=-1e9,c=1e9,d=-1e9;for(const p of T.p){a=Math.min(a,p.x);b=Math.max(b,p.x);c=Math.min(c,p.z);d=Math.max(d,p.z)}return{x:(a+b)/2,z:(c+d)/2}})();   /* centro do autódromo */
 (function ground(){const SZ=2600,SEG=MOBILE?170:325;const g=new THREE.PlaneGeometry(SZ,SZ,SEG,SEG);g.rotateX(-Math.PI/2);const pos=g.attributes.position;
   const coarse=[];for(let i=0;i<N;i+=8)coarse.push(T.p[i]);let mean=0;for(const q of T.y)mean+=q;mean/=N;
   const gy=(x,z)=>{let bd=1e18,by=mean;for(const q of coarse){const d=(q.x-x)*(q.x-x)+(q.z-z)*(q.z-z);if(d<bd){bd=d;by=q.y}}
     const dist=Math.sqrt(bd);const t=clamp((dist-70)/400,0,1);const roll=Math.sin(x*0.004)*Math.cos(z*0.0035)*9;let y=lerp(by-0.9,mean+roll-5,t*t*(3-2*t));
     for(const q of coarse){const dd=Math.hypot(q.x-x,q.z-z);if(dd<260){const cap=q.y-0.9+Math.max(0,dd-(HW+18))/3;if(cap<y)y=cap}}return{y,dist}};   /* nunca cobre nenhum trecho da pista */
-  /* lagos de Interlagos: pontos da área interna mais longe da pista (dentro do polígono do traçado) */
+  /* lagos: pontos da área interna mais longe da pista (dentro do polígono do traçado) */
   const inside=(x,z)=>{let c=false;for(let i=0,j=coarse.length-1;i<coarse.length;j=i++){const a=coarse[i],b=coarse[j];if(((a.z>z)!==(b.z>z))&&(x<(b.x-a.x)*(z-a.z)/(b.z-a.z)+a.x))c=!c}return c};
-  const cand=[];for(let x=-600;x<=800;x+=20)for(let z=-500;z<=300;z+=20){if(!inside(x,z))continue;const r=gy(x,z);if(r.dist>HW+48)cand.push({x,z,d:r.dist})}cand.sort((a,b)=>b.d-a.d);
-  const LAKES=[];for(const c of cand){if(LAKES.length>=2)break;if(LAKES.every(l=>Math.hypot(l.x-c.x,l.z-c.z)>220)){const R=Math.min(c.d-(HW+30),80);const w=gy(c.x,c.z).y-0.5;LAKES.push({x:c.x,z:c.z,R,w,ph:Math.random()*6})}}
+  const cand=[];if(0)for(let x=-600;x<=800;x+=20)for(let z=-500;z<=300;z+=20){if(!inside(x,z))continue;const r=gy(x,z);if(r.dist>HW+48)cand.push({x,z,d:r.dist})}cand.sort((a,b)=>b.d-a.d);
+  const LAKES=[];for(const c of cand){if(LAKES.length>=0)break;   /* deserto: sem lagos (Interlagos tinha 2) */if(LAKES.every(l=>Math.hypot(l.x-c.x,l.z-c.z)>220)){const R=Math.min(c.d-(HW+30),80);const w=gy(c.x,c.z).y-0.5;LAKES.push({x:c.x,z:c.z,R,w,ph:Math.random()*6})}}
   const lakeR=(l,a)=>l.R*(1+0.16*Math.sin(3*a+l.ph)+0.09*Math.sin(5*a+l.ph*2));
-  for(let i=0;i<pos.count;i++){const x=pos.getX(i)+126,z=pos.getZ(i)-103;let{y}=gy(x,z);
+  for(let i=0;i<pos.count;i++){const x=pos.getX(i)+TC.x,z=pos.getZ(i)+TC.z;let{y}=gy(x,z);
     for(const l of LAKES){const d=Math.hypot(x-l.x,z-l.z);const r=lakeR(l,Math.atan2(z-l.z,x-l.x));if(d<r)y=Math.min(y,l.w-0.4-2.2*(1-d/r));else if(d<r+10)y=Math.min(y,l.w-0.3+(d-r)*0.2)}
     pos.setX(i,x);pos.setZ(i,z);pos.setY(i,y)}
   window.WATER_NM=canvasTex(256,256,(x,w,h)=>{const hgt=new Float32Array(w*h);for(let k=0;k<160;k++){const cx=Math.random()*w,cy=Math.random()*h,rr=4+Math.random()*18,a=(Math.random()-.5);for(let yy=-rr;yy<=rr;yy++)for(let xx=-rr;xx<=rr;xx++){const d=Math.hypot(xx,yy)/rr;if(d>1)continue;const px=(((cx+xx)|0)+w)%w,py=(((cy+yy)|0)+h)%h;hgt[py*w+px]+=a*Math.cos(d*Math.PI*0.5)}}
@@ -412,19 +417,19 @@ const tecTex=canvasTex(256,64,(x,w,h)=>{for(let b=0;b<2;b++){const x0=b*w/2;x.fi
     const geo=new THREE.ShapeGeometry(sh,4);geo.rotateX(-Math.PI/2);const uvw=geo.attributes.uv;for(let k=0;k<uvw.count;k++)uvw.setXY(k,uvw.getX(k)/40,uvw.getY(k)/40);
     const water=new THREE.Mesh(geo,waterM);water.position.set(l.x,l.w,l.z);water.receiveShadow=true;water.userData.noMerge=true;scene.add(water)}
   window.__lakes=LAKES;
-  const far=new THREE.Mesh(new THREE.PlaneGeometry(9000,9000,1,1).rotateX(-Math.PI/2),new THREE.MeshStandardMaterial(Object.assign({},grassPBR)));far.position.set(126,Math.min(...T.y)-12,-103);   /* abaixo do ponto mais baixo da pista */scene.add(far);
+  const far=new THREE.Mesh(new THREE.PlaneGeometry(9000,9000,1,1).rotateX(-Math.PI/2),new THREE.MeshStandardMaterial(Object.assign({},gravelPBR,{color:srgb('#f4ead6')})));far.position.set(TC.x,Math.min(...T.y)-12,TC.z);   /* abaixo do ponto mais baixo da pista */scene.add(far);
   g.computeVertexNormals();const uv=g.attributes.uv;for(let i=0;i<uv.count;i++)uv.setXY(i,uv.getX(i)*320,uv.getY(i)*320);
-  const m=new THREE.Mesh(g,new THREE.MeshStandardMaterial(grassPBR));m.receiveShadow=true;scene.add(m);
+  const m=new THREE.Mesh(g,new THREE.MeshStandardMaterial(Object.assign({},gravelPBR,{color:srgb('#f4ead6')})));m.receiveShadow=true;scene.add(m);   /* areia do deserto */
   window.INFIELD=inside;city(mean);})();
-/* São Paulo em volta do autódromo: prédios instanciados, fachada com janelas (uma textura, cor por instância) */
+/* arredores de Sakhir: construções baixas cor de areia espalhadas pelo deserto (instanciadas, uma textura de fachada) */
 function city(mean){const facade=canvasTex(128,256,(x,w,h)=>{x.fillStyle='#d8d2c8';x.fillRect(0,0,w,h);for(let fy=6;fy<h-4;fy+=12){x.fillStyle='rgba(0,0,0,.08)';x.fillRect(0,fy+9,w,2);for(let fx=6;fx<w-6;fx+=14){const lit=Math.random();x.fillStyle=lit<.12?'#9fb7cc':lit<.2?'#3b4652':'#56616d';x.fillRect(fx,fy,9,7)}}});
   facade.wrapS=facade.wrapT=THREE.RepeatWrapping;
   const geo=new THREE.BoxGeometry(1,1,1);geo.translate(0,0.5,0);const uv=geo.attributes.uv;for(let i=0;i<uv.count;i++)uv.setXY(i,uv.getX(i),uv.getY(i)); // UV ajustado por instância via escala no shader seria caro: repetimos pela altura média
   const m=new THREE.MeshStandardMaterial({map:facade,roughness:.85,metalness:0});const roofM=new THREE.MeshStandardMaterial({color:srgb('#8d8a85'),roughness:1});
-  const list=[];const tints=['#ffffff','#e9e4da','#cfd5dc','#f2ead8','#bfc3c7','#e6d6c0','#a9b4bf'];
-  let tries=0;while(list.length<(MOBILE?450:900)&&tries<20000){tries++;const i=(Math.random()*N)|0;const side=Math.random()<.5?-1:1;const off=side*(HW+180+Math.pow(Math.random(),0.7)*1100);const p=T.p[i],n=T.n[i];const x=p.x+n.x*off,z=p.z+n.z*off;
+  const list=[];const tints=['#f2e6cf','#e6d3b0','#d9c39c','#efe2c8','#cdb791','#f5efe3'];
+  let tries=0;while(list.length<(MOBILE?90:180)&&tries<20000){tries++;const i=(Math.random()*N)|0;const side=Math.random()<.5?-1:1;const off=side*(HW+300+Math.pow(Math.random(),0.6)*1300);const p=T.p[i],n=T.n[i];const x=p.x+n.x*off,z=p.z+n.z*off;
     if(trackDist(x,z,200)<HW+160)continue;if(window.INFIELD&&INFIELD(x,z))continue;   /* área interna do autódromo: sem prédios */
-    const far=Math.hypot(x-126,z+103);const hgt=far>900?20+Math.random()*95:10+Math.random()*45;const w=14+Math.random()*26,d=14+Math.random()*26;list.push([x,z,w,hgt,d,Math.random()*Math.PI,tints[(Math.random()*tints.length)|0]])}
+    const far=Math.hypot(x-TC.x,z-TC.z);const hgt=5+Math.random()*Math.random()*30;const w=16+Math.random()*40,d=14+Math.random()*30;void far;list.push([x,z,w,hgt,d,Math.random()*Math.PI,tints[(Math.random()*tints.length)|0]])}
   const im=new THREE.InstancedMesh(geo,m,list.length);const o=new THREE.Object3D();
   list.forEach((b,k)=>{o.position.set(b[0],mean-6,b[1]);o.rotation.set(0,b[5],0);o.scale.set(b[2],b[3],b[4]);o.updateMatrix();im.setMatrixAt(k,o.matrix);im.setColorAt(k,srgb(b[6]))});
   im.castShadow=false;im.receiveShadow=false;scene.add(im);window.__dbg&&(window.__dbg.city=im)}
@@ -442,28 +447,25 @@ function grandstand1(s,len,lat,tiers,roof){const f=frameAt(s,lat);{const side=Ma
   if(roof){const r=new THREE.Mesh(new THREE.BoxGeometry(len+4,0.4,tiers*3.2+6),mat(0xe9ecef,.5));r.position.set(0,1.6*tiers+5.5,side*(tiers*3.2/2));r.castShadow=true;g.add(r);
     for(let x=-len/2;x<=len/2;x+=len/6){const c=new THREE.Mesh(new THREE.CylinderGeometry(.25,.25,1.6*tiers+5.5,8),mat(0xd0d4da));c.position.set(x,(1.6*tiers+5.5)/2,side*(tiers*3.2+2));g.add(c)}}
   scene.add(g);return g}
-grandstand(T.L-330,520,HW+24,6,true);          // reta dos boxes (lado externo)
-grandstand(S1-140,230,HW+24,4,true);               // Curva do Sol
-grandstand(0.24*T.L,120,-(HW+22),3,false);          // saída Curva do Sol
-grandstand(0.42*T.L,160,HW+22,3,false);             // Descida do Lago
-grandstand(0.63*T.L,140,-(HW+22),3,false);          // Bico de Pato
-grandstand(0.80*T.L,220,HW+24,4,true);              // Junção / Subida dos Boxes
+grandstand(T.L-330,520,-PS*(HW+24),6,true);       // reta dos boxes (lado de fora, em frente aos boxes)
+for(const [s,len,t,roof] of[[760,220,5,true],[1560,160,4,true],[2220,120,3,false],[2790,140,3,false],[3420,160,4,true],[4980,160,3,false]])grandstand(s,len,outsideOf(idxAt(s))*(HW+24),t,roof);   /* T1, T4, T8, T10, T11, T14 */
 (function pits(){const tn=Object.keys(TEAMS);
   // muro dos boxes com perches
   const f0=frameAt(T.L-60,0);void f0;
-  const wall=ribbon(i=>-(HW+9.2),i=>-(HW+8.6),()=>new THREE.Color(.75,.77,.8),0,{recv:false});void wall;
-  for(let k=0;k<10;k++){const f=frameAt(T.L-40-k*34,-(HW+9.5));boxAt(6,2.2,1.6,f.x,f.y+1.6,f.z,f.ry,mat(0x1c2026),true);const st=boxAt(5.6,0.4,1.4,f.x,f.y+2.9,f.z,f.ry,mat(TEAMS[tn[k]].c,.5),false);void st}
+  const wall=ribbon(i=>PS*(HW+9.2),i=>PS*(HW+8.6),()=>new THREE.Color(.75,.77,.8),0,{recv:false});void wall;
+  for(let k=0;k<10;k++){const f=frameAt(T.L-40-k*34,PS*(HW+9.5));boxAt(6,2.2,1.6,f.x,f.y+1.6,f.z,f.ry,mat(0x1c2026),true);const st=boxAt(5.6,0.4,1.4,f.x,f.y+2.9,f.z,f.ry,mat(TEAMS[tn[k]].c,.5),false);void st}
   // prédio dos boxes
-  const fb=frameAt(T.L-200,-(HW+36));const pitFac=canvasTex(512,64,(x,w,h)=>{x.fillStyle='#e9ecef';x.fillRect(0,0,w,h);x.fillStyle='#2f3a46';for(let i=4;i<w;i+=16)x.fillRect(i,8,12,22);x.fillStyle='#1d232b';for(let i=0;i<w;i+=32)x.fillRect(i+2,38,28,26)});pitFac.repeat.set(12,1);
+  const fb=frameAt(T.L-200,PS*(HW+36));const pitFac=canvasTex(512,64,(x,w,h)=>{x.fillStyle='#e9ecef';x.fillRect(0,0,w,h);x.fillStyle='#2f3a46';for(let i=4;i<w;i+=16)x.fillRect(i,8,12,22);x.fillStyle='#1d232b';for(let i=0;i<w;i+=32)x.fillRect(i+2,38,28,26)});pitFac.repeat.set(12,1);
   boxAt(470,9,24,fb.x,fb.y+4.5,fb.z,fb.ry,new THREE.MeshStandardMaterial({map:pitFac,roughness:.6}),true);
   boxAt(470,2.6,24.4,fb.x,fb.y+7.4,fb.z,fb.ry,mat(0x8fb3d9,.2,{metalness:.6}),false);     // vidro do 2º andar
   boxAt(474,0.6,26,fb.x,fb.y+9.2,fb.z,fb.ry,mat(0xe2e5ea,.6),true);
-  for(let k=0;k<10;k++){const f=frameAt(T.L-40-k*34,-(HW+24.6));boxAt(14,5.2,0.6,f.x,f.y+2.6,f.z,f.ry,mat(0x2a2f36,.4),false);const strip=boxAt(14,0.9,0.7,f.x,f.y+5.8,f.z,f.ry,mat(TEAMS[tn[k]].c,.5),false);void strip;
-    const sign=new THREE.Mesh(new THREE.PlaneGeometry(10,1.6),new THREE.MeshBasicMaterial({map:textTex(TEAMS[tn[k]].n.toUpperCase(),'#111',TEAMS[tn[k]].c,512,96)}));sign.position.set(f.x,f.y+7.0,f.z);sign.rotation.y=f.ry;scene.add(sign)}
-  // torre de controle
-  const ft=frameAt(T.L+20,-(HW+36));const towFac=canvasTex(64,256,(x,w,h)=>{x.fillStyle='#dfe3e8';x.fillRect(0,0,w,h);x.fillStyle='#3a4756';for(let y=6;y<h;y+=14)x.fillRect(4,y,w-8,8)});boxAt(14,30,14,ft.x,ft.y+15,ft.z,ft.ry,new THREE.MeshStandardMaterial({map:towFac,roughness:.5}),true);boxAt(20,4,20,ft.x,ft.y+31,ft.z,ft.ry,mat(0x8fb3d9,.2,{metalness:.6}),true);
-  // letreiro INTERLAGOS no topo
-  const lt=new THREE.Mesh(new THREE.PlaneGeometry(90,6),new THREE.MeshBasicMaterial({map:textTex('AUTÓDROMO JOSÉ CARLOS PACE · INTERLAGOS','#e10600','#fff',2048,128),side:THREE.DoubleSide}));lt.position.set(fb.x,fb.y+13.5,fb.z);lt.rotation.y=fb.ry;scene.add(lt);
+  for(let k=0;k<10;k++){const f=frameAt(T.L-40-k*34,PS*(HW+24.6));boxAt(14,5.2,0.6,f.x,f.y+2.6,f.z,f.ry,mat(0x2a2f36,.4),false);const strip=boxAt(14,0.9,0.7,f.x,f.y+5.8,f.z,f.ry,mat(TEAMS[tn[k]].c,.5),false);void strip;
+    const sign=new THREE.Mesh(new THREE.PlaneGeometry(10,1.6),new THREE.MeshBasicMaterial({map:textTex(TEAMS[tn[k]].n.toUpperCase(),'#111',TEAMS[tn[k]].c,512,96)}));sign.position.set(f.x,f.y+7.0,f.z);sign.rotation.y=f.ry+(PS>0?Math.PI:0);   /* placa virada pra pista */scene.add(sign)}
+  // Torre de Sakhir (VIP): fuste de 8 andares e cobertura larga em balanço
+  const ft=frameAt(T.L+20,PS*(HW+52));const towFac=canvasTex(64,256,(x,w,h)=>{x.fillStyle='#e8dcc4';x.fillRect(0,0,w,h);x.fillStyle='#3a4756';for(let y=6;y<h;y+=14)x.fillRect(4,y,w-8,8)});boxAt(16,34,16,ft.x,ft.y+17,ft.z,ft.ry,new THREE.MeshStandardMaterial({map:towFac,roughness:.5}),true);
+  boxAt(30,6,30,ft.x,ft.y+37,ft.z,ft.ry,mat(0x8fb3d9,.2,{metalness:.6}),true);boxAt(40,1.4,40,ft.x,ft.y+40.7,ft.z,ft.ry,mat(0xf1ece2,.6),true);boxAt(24,3,24,ft.x,ft.y+42.5,ft.z,ft.ry,mat(0xe6dccb,.6),true);
+  // letreiro no topo do prédio dos boxes
+  const lt=new THREE.Mesh(new THREE.PlaneGeometry(90,6),new THREE.MeshBasicMaterial({map:textTex('BAHRAIN INTERNATIONAL CIRCUIT · SAKHIR','#e10600','#fff',2048,128),side:THREE.DoubleSide}));lt.position.set(fb.x,fb.y+13.5,fb.z);lt.rotation.y=fb.ry+(PS>0?Math.PI:0);scene.add(lt);
 })();
 (function gantry(){const li=T.p[0],ti=T.t[0];const g=new THREE.Group();g.position.copy(li);g.rotation.y=-Math.atan2(ti.z,ti.x);const pm=mat(0x1a1d22,.5);
   for(const z of[-(HW+2),HW+2]){const p=new THREE.Mesh(new THREE.BoxGeometry(.5,9.5,.5),pm);p.position.set(0,4.7,z);g.add(p)}
@@ -472,7 +474,7 @@ grandstand(0.80*T.L,220,HW+24,4,true);              // Junção / Subida dos Box
   race_lights=[];for(let k=0;k<5;k++){const l=new THREE.Mesh(new THREE.SphereGeometry(.26,10,8),new THREE.MeshStandardMaterial({color:0x2a0000,emissive:0x000000}));l.position.set(-0.25,8.2,-1.6+k*0.8);l.userData.noMerge=true;g.add(l);race_lights.push(l)}
   scene.add(g);
   // ponte de patrocínio
-  const f=frameAt(T.L-250,0);const b=new THREE.Mesh(new THREE.BoxGeometry(1.2,2.6,2*HW+10),new THREE.MeshBasicMaterial({map:textTex('GRANDE PRÊMIO DE SÃO PAULO 2025','#0b1a33','#fff',2048,160)}));b.position.set(f.x,f.y+8.4,f.z);b.rotation.y=f.ry;scene.add(b);
+  const f=frameAt(T.L-250,0);const b=new THREE.Mesh(new THREE.BoxGeometry(1.2,2.6,2*HW+10),new THREE.MeshBasicMaterial({map:textTex('GULF AIR BAHRAIN GRAND PRIX 2025','#7a0c1e','#fff',2048,160)}));b.position.set(f.x,f.y+8.4,f.z);b.rotation.y=f.ry;scene.add(b);
   for(const s of[-1,1]){const p=new THREE.Mesh(new THREE.BoxGeometry(.6,8,.6),pm);const n=T.n[f.i];p.position.set(f.x+n.x*s*(HW+4.5),f.y+4,f.z+n.z*s*(HW+4.5));scene.add(p)}})();
 (function scenery(){
   // placas de frenagem e DRS
@@ -482,7 +484,7 @@ grandstand(0.80*T.L,220,HW+24,4,true);              // Junção / Subida dos Box
   for(const z of DRS_ZONES){const f=frameAt(z.from%T.L,HW+3.4);const b=new THREE.Mesh(new THREE.BoxGeometry(.1,1.6,1.3),new THREE.MeshBasicMaterial({map:textTex('DRS','#111','#3ddc84',256,160)}));b.position.set(f.x,f.y+1.4,f.z);b.rotation.y=f.ry;scene.add(b);
     const fd=frameAt(z.det,-(HW+3.4));const bd=new THREE.Mesh(new THREE.BoxGeometry(.1,1.0,1.6),new THREE.MeshBasicMaterial({map:textTex('DETECÇÃO','#111','#fff',256,96)}));bd.position.set(fd.x,fd.y+1.2,fd.z);bd.rotation.y=fd.ry;scene.add(bd)}
   // placas de patrocínio sobre os muros nas retas
-  const ads=['SÃO PAULO','INTERLAGOS','GP BRASIL 2025','F1','PIRELLI','ROLEX','DHL','AWS','HEINEKEN','CRYPTO.COM','QATAR AIRWAYS','MSC'];const adCol=['#e10600','#0b1a33','#00a19c','#111','#ffd400','#1b5e20','#d40511','#232f3e','#0b6b2c','#0a2540','#5c0632','#0d2a4a'];
+  const ads=['GULF AIR','BAHRAIN','SAKHIR','F1','PIRELLI','ROLEX','DHL','AWS','HEINEKEN','CRYPTO.COM','QATAR AIRWAYS','MSC'];const adCol=['#e10600','#0b1a33','#00a19c','#111','#ffd400','#1b5e20','#d40511','#232f3e','#0b6b2c','#0a2540','#5c0632','#0d2a4a'];
   for(let s=0,k=0;s<T.L;s+=70,k++){const i=idxAt(s);if(isRunoff(i))continue;for(const side of[-1,1]){const f=frameAt(s,side*(HW+14.6));const m=new THREE.Mesh(new THREE.BoxGeometry(60,1.0,.12),new THREE.MeshBasicMaterial({map:textTex(ads[(k+side+12)%12],adCol[(k+side+12)%12],'#fff',2048,96)}));m.position.set(f.x,f.y+1.7,f.z);m.rotation.y=f.ry;scene.add(m)}}
   // pilhas de pneus nas curvas (instanciadas)
   (function tyres(){const geo=new THREE.CylinderGeometry(.36,.36,.95,12);const m=new THREE.MeshStandardMaterial({color:0xffffff,roughness:.92});const list=[];const RUB=new THREE.Color(0x141414),WH=new THREE.Color(0xe8e8e8),RD=new THREE.Color(0xc41212);
@@ -498,7 +500,7 @@ grandstand(0.80*T.L,220,HW+24,4,true);              // Junção / Subida dos Box
     /* normais de esfera (sem facetas) e sombra embaixo da copa: volume de folhagem sem custo */const nn=crownGeo.attributes.normal,cc=new Float32Array(pp.count*3);for(let i=0;i<pp.count;i++){const v=new THREE.Vector3().fromBufferAttribute(pp,i);const sn=v.clone().normalize();const fn=new THREE.Vector3().fromBufferAttribute(nn,i);sn.lerp(fn,0.25).normalize();nn.setXYZ(i,sn.x,sn.y,sn.z);const ao=0.45+0.55*clamp(v.y*0.6+0.55,0,1);cc[i*3]=cc[i*3+1]=cc[i*3+2]=ao}crownGeo.setAttribute('color',new THREE.BufferAttribute(cc,3))}
   const leafTex=canvasTex(256,256,(x,w,h)=>{x.clearRect(0,0,w,h);   /* fundo vazado: a copa fica com contorno de folhas e não de bola */for(let k=0;k<1500;k++){const l=40+Math.random()*60;x.fillStyle=`hsl(${85+Math.random()*30},${22+Math.random()*20}%,${l*0.42}%)`;x.beginPath();x.ellipse(Math.random()*w,Math.random()*h,2+Math.random()*4.5,1.2+Math.random()*2.5,Math.random()*3,0,7);x.fill()}},[2,2]);   /* repetição 2: folhas na metade do tamanho */leafTex.encoding=THREE.sRGBEncoding;
   const crownM=new THREE.MeshStandardMaterial({map:leafTex,roughness:.95,vertexColors:true,alphaTest:.5,side:THREE.DoubleSide});const trunkM=mat(0x4a3524,1);const trunkG=new THREE.CylinderGeometry(.3,.5,5,6);trunkG.translate(0,2.5,0);
-  const trees=[];let tries=0;while(trees.length<(MOBILE?420:900)&&tries<12000){tries++;const i=(Math.random()*N)|0;const side=Math.random()<.5?-1:1;const off=side*(HW+28+Math.random()*150);const p=T.p[i],n=T.n[i];
+  const trees=[];let tries=0;while(trees.length<0&&tries<12000)   /* deserto: sem mata (Interlagos: 900) */{tries++;const i=(Math.random()*N)|0;const side=Math.random()<.5?-1:1;const off=side*(HW+28+Math.random()*150);const p=T.p[i],n=T.n[i];
     const x=p.x+n.x*off,z=p.z+n.z*off;const j=nearest(new THREE.Vector3(x,0,z),i);const d=trackDist(x,z,80);if(d<HW+26)continue;   /* checa a pista toda: trechos vizinhos de Interlagos */if(nearPits(x,z)||blocksTV(x,z))continue;if((window.__lakes||[]).some(l=>Math.hypot(x-l.x,z-l.z)<l.R*1.35+8))continue;   /* nada de árvore dentro dos lagos */trees.push([x,T.y[j]-0.8,z,0.8+Math.random()*1.1,Math.random()])}
   const cIM=new THREE.InstancedMesh(crownGeo,crownM,trees.length*3),tIM=new THREE.InstancedMesh(trunkG,trunkM,trees.length);const o=new THREE.Object3D();const col=new THREE.Color();
   trees.forEach((t,k)=>{const [x,y,z,s,r]=t;o.position.set(x,y,z);o.rotation.set(0,r*6.28,0);o.scale.setScalar(s);o.updateMatrix();tIM.setMatrixAt(k,o.matrix);
@@ -773,11 +775,13 @@ const fx=(function(){const MAXP=600;const geo=new THREE.BufferGeometry();const p
 
 /* ======================= CÂMERAS DE TV ======================= */
 const TVCAMS=tvSpots().map(c=>({s:c.s,pos:new THREE.Vector3(c.x,c.y+9,c.z)}));   /* grua de 9 m */
-TVCAMS.push({s:T.L-300,pos:(()=>{const f=frameAt(T.L-300,-(HW+8));return new THREE.Vector3(f.x,f.y+3.2,f.z)})()});
+TVCAMS.push({s:T.L-300,pos:(()=>{const f=frameAt(T.L-300,PS*(HW+8));return new THREE.Vector3(f.x,f.y+3.2,f.z)})()});
 TVCAMS.sort((a,b)=>a.s-b.s);
 /* ======================= FÍSICA ======================= */
 /* pneu e aerodinâmica de F1 2025: ~2,3 g em curva lenta, ~4,9 g a 250 km/h, ~6 g de frenagem */
 const MU0=2.0,CLA=5.0;
+const TRACK_TEMP=42;   /* asfalto de Sakhir (°C) */
+const REAR=0.56;   /* fração da carga (peso + downforce) no eixo traseiro */
 const G=9.81,RHO=1.2,WR=0.36,WB=3.6,GEARS=[14.8,11.0,8.9,7.5,6.5,5.7,5.1,4.67],RPM_MAX=12000;
 const enginePower=rpm=>{ // kW ICE 2025 (~630 kW no pico)
   const x=rpm/RPM_MAX;const f=x<0.4?0.25+x*0.9:x<0.95?0.61+(x-0.4)*0.71:1.0-(x-0.95)*1.8;return 630e3*clamp(f,0.2,1)};
@@ -799,7 +803,7 @@ class Car{
     // superfície
     const i=this.sIdx=nearest(this.pos,this.sIdx);const p=T.p[i],n=T.n[i];const lat=(this.pos.x-p.x)*n.x+(this.pos.z-p.z)*n.z;const al=Math.abs(lat);
     let surfMu=1,roll=0.012,bump=0;
-    if(al>HW){if(al<HW+1.6&&hasKerb(i)){surfMu=0.92;bump=1;if(this.isPlayer&&navigator.vibrate&&this.v>15&&!(this.kerbBuzz>0)){try{navigator.vibrate(18)}catch(e){}this.kerbBuzz=0.12}}else{surfMu=0.55;roll=0.08;this.offTrack+=dt}}
+    if(al>HW){if(al<HW+1.6&&hasKerb(i)){surfMu=0.92;bump=1;if(this.isPlayer&&navigator.vibrate&&this.v>15&&!(this.kerbBuzz>0)){try{navigator.vibrate(18)}catch(e){}this.kerbBuzz=0.12}}else if(isRunoff(i)&&outsideOf(i)===Math.sign(lat)&&al<HW+12.5){surfMu=0.9;roll=0.016;this.offTrack+=dt}   /* escape de asfalto */else{surfMu=0.55;roll=0.08;this.offTrack+=dt}}
     if(al>HW+14.2){const sg=Math.sign(lat);const nx=-n.x*sg,nz=-n.z*sg;               // normal da mureta apontando pra pista
       const push=al-(HW+14.2);this.pos.x+=nx*push;this.pos.z+=nz*push;
       let vx=Math.cos(this.va)*this.v,vz=Math.sin(this.va)*this.v;const vn=vx*nx+vz*nz;
@@ -821,7 +825,7 @@ class Car{
     if(opt.autoGear&&!this.ai||this.ai){if(this.rpm>11600&&this.gear<8&&this.throttle>0.2)this.gear++;else if(this.rpm<7200&&this.gear>1)this.gear--}
     let P=enginePower(this.rpm)*(this.rpm>RPM_MAX?0:1);
     if(this.ersDeploy&&this.ers>0&&this.throttle>0.3){P+=120e3;this.ers-=120e3*dt}
-    const Feng=Math.min(this.throttle*P/Math.max(v,4),Fmax*((this.ai||opt.tc)?0.96:1.5));
+    const Feng=Math.min(this.throttle*P/Math.max(v,4),Fmax*REAR*((this.ai||opt.tc)?0.96:1.5));   /* tração só no eixo traseiro: 0-100 ~2,6 s, 0-200 ~4,8 s */
     let Fbr=this.brake*Fmax*0.98;   // freio no limite do grip: só trava se somar com curva (ou na grama)
     if(this.brake>0&&v>15){this.ers=Math.min(4e6,this.ers+Math.min(120e3,Fbr*v*0.25)*dt)}
     if(this.throttle>0.5)this.ers=Math.min(4e6,this.ers+45e3*this.throttle*dt); // MGU-H
@@ -861,7 +865,7 @@ class Car{
     // temperatura e desgaste
     const load=(Math.abs(Flat)+Math.abs(Flong))/Math.max(m*G,1);
     for(let w=0;w<4;w++){const front=w<2;const side=(w%2?1:-1)*Math.sign(kAct||0.0001);const f=1+(side>0?0.25:0)*Math.min(1,Math.abs(kAct)*150)+(front?0:this.spin*1.5)+(front?this.lock*1.5:0);
-      this.temp[w]=clamp(this.temp[w]+(load*this.v*0.009*f+this.slip*2.2)*dt-(this.temp[w]-28)*(0.008+this.v*0.00025)*dt,20,160)}
+      this.temp[w]=clamp(this.temp[w]+(load*this.v*0.009*f+this.slip*2.2)*dt-(this.temp[w]-TRACK_TEMP)*(0.0078+this.v*0.0002)*dt,20,160)}
     this.wear=Math.min(1,this.wear+(load*this.v*0.0001+this.slip*0.004+this.spin*0.003+this.lock*0.003)*this.comp.wear*dt*(surfMu<0.7?2:1)); // ~1 vida útil = comp.wear⁻¹ voltas
     // DRS fecha ao frear
     if(this.brake>0.1)this.drsOpen=false;
@@ -896,8 +900,8 @@ class Car{
   flash(race,k){if(!this.isPlayer)return;const t=this.cur[k];const cls=(race.bestSec[k]==null||t<=race.bestSec[k])?'p':(this.bestSec[k]==null||t<=this.bestSec[k])?'g':'y';race.secCls[k]=cls}
   enterPit(race){this.inPit=true;this.pitReq=false;this.pitU=0;this.pitStop=0;this.pitDone=false;this.drsOpen=false;const tn=Object.keys(TEAMS);this.boxU=pitBoxU(tn.indexOf(this.d.t));this.throttle=this.brake=0;if(this.isPlayer)race.toast('PIT STOP','limite de 80 km/h')}
   pitUpdate(dt,race){const vmax=22.2;const prog=this.pitU*pitLen;
-    if(!this.pitDone&&this.pitU>=this.boxU){this.pitStop+=dt;this.v=0;const need=2.4+(this.isPlayer?0:Math.random()*0.6);
-      if(this.pitStop>need){this.pitDone=true;this.setTyres(this.nextComp||(this.compKey==='S'?'M':this.compKey==='M'?'H':'M'));this.stops++;this.temp=[82,82,82,82]}}
+    if(!this.pitDone&&this.pitU>=this.boxU){this.pitStop+=dt;this.v=0;const need=2.4+(this.isPlayer?0:Math.random()*0.6)+(this.wing>0.05?7:0);   /* troca de bico: ~+7 s parado */
+      if(this.pitStop>need){this.pitDone=true;if(this.wing>0.05){this.wing=0;this.dmg=Math.min(this.dmg,0.15)}   /* bico novo */this.setTyres(this.nextComp||(this.compKey==='S'?'M':this.compKey==='M'?'H':'M'));this.stops++;this.temp=[82,82,82,82]}}
     else{this.v=Math.min(vmax,this.v+8*dt);this.pitU=Math.min(1,this.pitU+this.v*dt/pitLen)}
     const p=pitCurve.getPointAt(this.pitU);const t=pitCurve.getTangentAt(this.pitU);this.sIdx=nearest(p,this.sIdx);p.y=T.y[this.sIdx];this.pos.copy(p);this.hd=this.va=Math.atan2(t.z,t.x);
     this.rpm=4500+this.v*60;this.gear=this.v>0?2:1;
@@ -926,20 +930,20 @@ class Car{
 }
 
 /* ======================= IA ======================= */
-let VPROF=null;
+let VPROF=null,VCORN=null;   /* VCORN: limite só de curva (sem freada/aceleração); 98 m/s = reta */
 /* linha de corrida estilo F1 25: verde acelera, amarelo alivia, vermelho freia (pelo perfil de velocidade ~40 m à frente) */
 function colorRacingLine(){const col=rlMesh.geometry.attributes.color;const G=new THREE.Color(0.15,0.9,0.35),Y=new THREE.Color(1,0.8,0.1),Rr=new THREE.Color(1,0.12,0.1),c=new THREE.Color();const ahead=Math.round(40/T.ds);
   for(let i=0;i<=N;i++){const j=i%N;const dv=VPROF[(j+ahead)%N]-VPROF[j];const t=clamp(-dv/18,0,1);t<0.25?c.copy(G):t<0.55?c.copy(G).lerp(Y,(t-0.25)/0.3):c.copy(Y).lerp(Rr,Math.min(1,(t-0.55)/0.3));c.convertSRGBToLinear();col.setXYZ(i*2,c.r,c.g,c.b);col.setXYZ(i*2+1,c.r,c.g,c.b)}col.needsUpdate=true}
 function buildProfile(){const m=798+108;const mu=MU0;const v=new Array(N);
-  for(let i=0;i<N;i++){const k=Math.abs(KLINE[i])+1e-5;let vv=60;   /* curvatura da trajetória real seguida */for(let it=0;it<6;it++){const DF=0.5*RHO*CLA*vv*vv;vv=Math.sqrt(mu*(G+DF/m)/k)}v[i]=Math.min(vv,98)}
+  for(let i=0;i<N;i++){const k=Math.abs(KLINE[i])+1e-5;let vv=60;   /* curvatura da trajetória real seguida */for(let it=0;it<6;it++){const DF=0.5*RHO*CLA*vv*vv;vv=Math.sqrt(mu*(G+DF/m)/k)}v[i]=Math.min(vv,98)}VCORN=v.slice();
   for(let pass=0;pass<2;pass++){for(let j=0;j<N*2;j++){const i=(N-1-(j%N)+N)%N,nx=(i+1)%N;const vn=v[nx];const DF=0.5*RHO*CLA*vn*vn;const aMax=mu*(G+DF/m);const latFr=Math.min(1,vn*vn*Math.abs(KLINE[nx])/aMax);const aB=aMax*Math.sqrt(1-latFr*latFr)*0.9;v[i]=Math.min(v[i],Math.sqrt(vn*vn+2*aB*T.ds))}
-    for(let j=0;j<N*2;j++){const i=j%N,nx=(i+1)%N;const vi=v[i];const DF=0.5*RHO*CLA*vi*vi;const aA=Math.min((enginePower(9500)+120e3)/(m*Math.max(vi,5))   /* motor + ERS */-0.5*RHO*1.05*vi*vi/m,mu*(G+DF/m)*0.7);v[nx]=Math.min(v[nx],Math.sqrt(vi*vi+2*Math.max(aA,0.5)*T.ds))}}
+    for(let j=0;j<N*2;j++){const i=j%N,nx=(i+1)%N;const vi=v[i];const DF=0.5*RHO*CLA*vi*vi;const aA=Math.min((enginePower(9500)+120e3)/(m*Math.max(vi,5))   /* motor + ERS */-0.5*RHO*1.05*vi*vi/m,mu*(G+DF/m)*REAR*0.96);v[nx]=Math.min(v[nx],Math.sqrt(vi*vi+2*Math.max(aA,0.5)*T.ds))}}
   VPROF=v}
 class AI{
   constructor(car,base){this.car=car;car.ai=this;this.skill=base*car.d.sk;this.lat=0;this.latT=0;this.noise=0;this.nT=0;this.pitLap=null;this.aggr=0.5+Math.random()*0.5;this.lapMul=1}
   drive(dt,race){const c=this.car;if(c.inPit)return;const v=c.v;
     if(race.state!=='racing'){c.throttle=0;c.brake=1;return}
-    const i=c.sIdx;const look=Math.round((6+v*0.3)/T.ds);const tAvg=(c.temp[0]+c.temp[1]+c.temp[2]+c.temp[3])/4;const gf=clamp(1-Math.pow((tAvg-c.comp.opt)/70,2),0.55,1)*(1-0.28*c.wear)*(1-0.25*c.dmg)*c.comp.mu;
+    const i=c.sIdx;const look=Math.round((6+v*0.3)/T.ds);const tAvg=(c.temp[0]+c.temp[1]+c.temp[2]+c.temp[3])/4;const gf=clamp(1-Math.pow((tAvg-c.comp.opt)/70,2),0.55,1)*(1-0.28*c.wear)*(1-0.25*c.dmg)*(1-0.3*(c.wing||0))*c.comp.mu;   /* asa quebrada: menos downforce, anda mais devagar em vez de sair da pista */
     const ti=(i+look)%N;const p0=T.p[i],n0=T.n[i];const myLat=(c.pos.x-p0.x)*n0.x+(c.pos.z-p0.z)*n0.z;
     // alvo lateral: linha de corrida + desvio para ultrapassagem
     this.nT-=dt;if(this.nT<=0){this.nT=0.6+Math.random();this.noise=(Math.random()-.5)*0.5}
@@ -964,16 +968,22 @@ class AI{
     const steerMax=0.42/(1+v/22);const DF=0.5*RHO*CLA*v*v;const kLim0=MU0*c.carPerf*gf*(G+DF/c.mass)/(v*v+4);const bfrac=clamp(c.brake*1.05,0,0.95);const kLim=kLim0*Math.sqrt(1-bfrac*bfrac)*1.04;const sLim=Math.atan(kLim*WB);steerAng=clamp(steerAng,-sLim,sLim);c.steer=clamp(steerAng/steerMax,-1,1);
     // velocidade alvo
     let vt=1e9;const horizon=Math.round(Math.max(40,v*3.2)/T.ds);
-    for(let j=0;j<=horizon;j+=2){const ii=(i+j)%N;const vp=VPROF[ii]*Math.sqrt(this.skill*gf)*0.97*this.lapMul;const aB=(lane&&lane.dist<30?0.68:0.8)*MU0*this.skill*gf*(G+0.5*RHO*CLA*vp*vp/c.mass);const vb=Math.sqrt(vp*vp+2*aB*j*T.ds);if(vb<vt)vt=vb}
+    /* freada com a = A + B·v² (downforce e arrasto crescem com a velocidade): v² = (vp² + A/B)·e^(2B·d) − A/B.
+       Usar a aceleração da velocidade da curva subestimava a freada de 300+ km/h (freava 120 m antes em Sakhir) */
+    const kB=(lane&&lane.dist<30?0.72:0.86)*MU0*this.skill*gf,A=kB*G,B=(kB*0.5*RHO*CLA+0.5*RHO*1.05)/c.mass;
+    const fC=Math.sqrt(this.skill*gf)*0.97*this.lapMul;   /* grip só limita curva: na reta e na saída o carro acelera tudo que o motor dá */
+    for(let j=0;j<=horizon;j+=2){const ii=(i+j)%N;if(VCORN[ii]>=97.9)continue;const vp=VCORN[ii]*fC;const vb=Math.sqrt((vp*vp+A/B)*Math.exp(2*B*j*T.ds)-A/B);if(vb<vt)vt=vb}
+    {const ia=(i+Math.round((2+v*0.12)/T.ds))%N;if(VPROF[ia]<VCORN[ia]-0.5&&VPROF[ia]<VPROF[i])vt=Math.min(vt,VPROF[ia]*fC)}   /* entrada de curva: o perfil já tem a freada combinada com a curva */
     vt=Math.min(vt,this.gapCap);if(c.surf<0.7){vt=Math.min(vt,14);this.lat=lerp(this.lat,0,dt*2)}
     const err=vt-v;
-    if(!(ahead&&ahead.dist<11&&v-ahead.v>0&&ahead.dlat<2.4)){c.throttle=clamp(err*0.6+0.1,0,1)*this.follow;const latUse=Math.min(0.85,Math.abs(kff)*v*v/(kLim0*(v*v+4)));const bMax=Math.sqrt(1-latUse*latUse)*0.95/1.05;c.brake=Math.min(clamp(-err*0.8,0,1),bMax)}
+    if(!(ahead&&ahead.dist<11&&v-ahead.v>0&&ahead.dlat<2.4)){c.throttle=clamp(err*0.6+0.1,0,1)*this.follow;const latUse=Math.min(0.85,Math.abs(KLINE[i])*v*v/(kLim0*(v*v+4)));   /* mesma curvatura do perfil (linha de corrida) */const bMax=Math.sqrt(1-latUse*latUse)*0.95/1.05;c.brake=Math.min(clamp(-err*0.8,0,1),bMax);   /* acelerador também divide o círculo de atrito: na saída de curva, pé no fundo abria a trajetória */const latNow=Math.min(0.98,Math.max(latUse,Math.abs(Ksharp[i])*v*v/(kLim0*(v*v+4))));c.throttle=Math.min(c.throttle,Math.sqrt(1-latNow*latNow)*1.4+0.04)}
     if(race.state==='racing'&&v<3)c.throttle=1;if(c.slip>0.3&&v>20)c.throttle*=0.6;if(Math.abs(myLat)>HW-1.2&&Math.sign(myLat)===-Math.sign(Ksm[i]||1)&&v>15)c.throttle*=0.4;
     // DRS/ERS
     c.drsOpen=c.inDRSZone&&c.drsOK&&c.throttle>0.8;
     c.ersDeploy=c.throttle>0.9&&v>25&&v<88&&c.ers>0.3e6;
     // estratégia de pit
     if(this.pitLap==null&&race.laps>=8)this.pitLap=Math.round(race.laps*(0.4+Math.random()*0.2));
+    if(c.wing>0.3&&!c.pitReq&&c.lap<race.laps){c.pitReq=true;c.nextComp=c.compKey==='S'?'M':'H'}   /* asa quebrada: box para bico novo */
     if(((this.pitLap&&c.lap===this.pitLap)||c.wear>0.78)&&!c.pitReq&&c.lap<race.laps-1&&race.laps>=8){c.pitReq=true;c.nextComp=c.compKey==='S'?'M':c.compKey==='M'?'H':'M'}
     if(c.pitReq&&c.s>PIT.entry-400&&c.s<PIT.entry){c.throttle=Math.min(c.throttle,0.3);if(v>60)c.brake=0.4;c.steer=clamp(c.steer+0.12,-1,1)}
   }
@@ -1042,8 +1052,8 @@ function readInput(dt){const c=race.player;if(!c)return;
   th=Math.max(th,(keys.KeyW||keys.ArrowUp||touch.gas)?1:0);br=Math.max(br,(keys.KeyS||keys.ArrowDown||touch.brake)?1:0);
   if(race.opt.autoGas&&!br)th=1;   /* acelerador automático: só solta quando freia */
   if(race.state!=='racing'){br=1;th=0;if(race.state==='lights'&&(keys.KeyW||keys.ArrowUp||touch.gas))th=0.001}
-  if(race.opt.brakeAssist&&race.state==='racing'&&!c.inPit&&VPROF){const v=c.v,i=c.sIdx;let vt=1e9;const hz=Math.round(Math.max(40,v*3.2)/T.ds);
-    for(let j=0;j<=hz;j+=2){const ii=(i+j)%N;const vp=VPROF[ii]*0.90;const aB=0.75*MU0*c.comp.mu*(G+0.5*RHO*CLA*vp*vp/c.mass);const vb=Math.sqrt(vp*vp+2*aB*j*T.ds);if(vb<vt)vt=vb}
+  if(race.opt.brakeAssist&&race.state==='racing'&&!c.inPit&&VPROF){const v=c.v,i=c.sIdx;let vt=1e9;const hz=Math.round(Math.max(40,v*3.2)/T.ds);const kA=0.75*MU0*c.comp.mu,aA=kA*G,aB=(kA*0.5*RHO*CLA+0.5*RHO*1.05)/c.mass;   /* a = A + B·v², como na IA */
+    for(let j=0;j<=hz;j+=2){const ii=(i+j)%N;if(VCORN[ii]>=97.9)continue;const vp=VCORN[ii]*0.90;const vb=Math.sqrt((vp*vp+aA/aB)*Math.exp(2*aB*j*T.ds)-aA/aB);if(vb<vt)vt=vb}
     if(v>vt){br=Math.max(br,clamp((v-vt)*0.6,0,1));th=Math.min(th,0)}c.assistBrake=v>vt}
   c.throttle=lerp(c.throttle,th,dt*12);c.brake=lerp(c.brake,br,dt*14);
   if((keys.Space||touch.drs)&&c.inDRSZone&&c.drsOK&&!c.inPit)c.drsOpen=true;
@@ -1150,7 +1160,7 @@ function hud(dt){const c=race.player;if(!c)return;hudT+=dt;
   $('sec').querySelectorAll('i').forEach((e,i)=>{e.className=c.sector>i||(c.lap>=2&&i===2&&c.sector===0)?race.secCls[i]:''});
   $('last').textContent=fmt(c.last);$('best').textContent=fmt(c.best);
   const dEl=$('delta');if(c.best&&c.sector>0){const ref=c.sector===1?c.bestSec[0]:c.bestSec[0]+c.bestSec[1];const now=c.sector===1?c.cur[0]:c.cur[0]+c.cur[1];const d=now-ref;dEl.textContent=fmtD(d);dEl.className='d '+(d<0?'neg':'pos')}else{dEl.textContent='--';dEl.className='d'}
-  if(hudT>0.25){hudT=0;const o=race.order();let h='<div class="hd">GP SÃO PAULO · V'+Math.min(Math.max(race.player.lap,1),race.laps)+'</div>';
+  if(hudT>0.25){hudT=0;const o=race.order();let h='<div class="hd">GP BAHREIN · V'+Math.min(Math.max(race.player.lap,1),race.laps)+'</div>';
     const pi=o.indexOf(race.player);
     o.forEach((x,i)=>{let g='';const far=!(i<3||Math.abs(i-pi)<=1);if(i===0)g=x.finished?'VENC':'Líder';else{const a=o[i-1];if(x.finished&&a.finished)g='+'+(x.finishT-a.finishT).toFixed(1);else{const gp=race.gapTo(x,a);g=gp>=99?'+1 V':'+'+gp.toFixed(1)}}
       h+=`<div class="r${x.isPlayer?' me':''}${x.inPit?' pit':''}${far?' far':''}"><span class="p">${i+1}</span><span class="c" style="background:${x.team.c}"></span><span>${x.d.c}${x.penalty?'<i class="pen">+'+x.penalty+'</i>':''}</span><span class="g${x.drsOpen?' drs':''}">${x.inPit?'PIT':g}</span></div>`});
@@ -1207,7 +1217,7 @@ let selDriver='VER';
   $('go').onclick=()=>{const v=id=>$(id).querySelector('.on').dataset.v;race.opt={driver:selDriver,laps:+v('laps'),diff:+v('diff'),tyre:v('tyre'),tc:$('aTC').checked,abs:$('aABS').checked,autoGear:$('aGear').checked,line:$('aLine').checked,steerAssist:$('aSteer').checked,autoGas:$('aAuto').checked,brakeAssist:$('aBrake').checked};
     race.laps=race.opt.laps;rlMesh.visible=race.opt.line;cam.mode=+v('camsel');canvas.setAttribute('tabindex','0');canvas.focus();$('menu').classList.add('hidden');$('res').classList.add('hidden');$('hud').classList.remove('hidden');race.paused=false;race.endT=null;race.goT=0;
     if(!VPROF){buildProfile();colorRacingLine()}setup();upgradePlayerCar();if(MOBILE)race.cars.forEach(c=>{if(c!==race.player)c.mesh.traverse(o=>{if(o.isMesh)o.castShadow=false})});audio.start();checkRotate();renderer.compile(scene,camera);if(composer)composer.render();/* pré-compila shaders */lastT=performance.now();acc=0}})();
-function showResults(){const o=race.order();const r=$('res');let h='<div class="wrap"><div class="eyebrow">Classificação final · GP de São Paulo 2025 · '+race.laps+' voltas</div><h1>Resultado</h1><table><tr><th>Pos</th><th></th><th>Piloto</th><th>Equipe</th><th>Gap</th><th>Melhor volta</th><th>Paradas</th></tr>';
+function showResults(){const o=race.order();const r=$('res');let h='<div class="wrap"><div class="eyebrow">Classificação final · GP do Bahrein 2025 · '+race.laps+' voltas</div><h1>Resultado</h1><table><tr><th>Pos</th><th></th><th>Piloto</th><th>Equipe</th><th>Gap</th><th>Melhor volta</th><th>Paradas</th></tr>';
   const w=o[0];o.forEach((c,i)=>{const gap=i===0?'Vencedor':c.finished?'+'+(c.finishT-w.finishT).toFixed(3):'+'+(w.lap-c.lap)+' volta(s)';const fl=race.fastestBy===c?' fl':'';
     h+=`<tr class="${c.isPlayer?'me':''}"><td class="n">${i+1}</td><td><span style="display:inline-block;width:5px;height:18px;background:${c.team.c}"></span></td><td>${c.d.n}${c.penalty?' <small style="color:var(--yellow)">+'+c.penalty+'s</small>':''}${c.reprimands?' <small style="color:var(--mut)">'+c.reprimands+' adv.</small>':''}</td><td>${c.team.n}</td><td>${gap}</td><td class="${fl}">${fmt(c.best)}</td><td>${c.stops}</td></tr>`});
   h+='</table><p class="foot">Volta mais rápida: '+(race.fastestBy?race.fastestBy.d.n+' · '+fmt(race.fastest):'--')+'. Largada do grid: P'+race.player.gridPos+'.</p><button class="start" id="again">Nova corrida</button></div>';
